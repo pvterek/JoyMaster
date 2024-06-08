@@ -1,0 +1,32 @@
+﻿@model List<Server.Models.ClientModel>
+
+@{
+    ViewData["Title"] = "Clients list";
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Address IP</th>
+            <th>Last Connection Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var client in Model)
+        {
+            <tr>
+                <td>@client.Id</td>
+                <td>@client.Name</td>
+                <td>@client.AddressIp</td>
+                <td>@client.LastConnectionDate</td>
+                <td>
+                    <a asp-action="Individual" asp-route-id="@client.Id" class="btn btn-primary">Take control</a>
+                    <a asp-action="Disconnect" asp-route-id="@client.Id" class="btn btn-danger">Disconnect</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

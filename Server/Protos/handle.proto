@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "Server.Protos";
+
+package handle;
+
+service Handler {
+  rpc CommandStream (stream InitRequest) returns (stream CommandReply);
+  rpc StreamDesktop (stream DesktopFrame) returns (stream Empty);
+}
+
+message InitRequest {
+  string id = 1;
+  string name = 2;
+  string message = 3;
+}
+
+message CommandReply {
+  string message = 1;
+}
+
+message DesktopFrame {
+  bytes image = 1;
+}
+
+message Empty{
+}
