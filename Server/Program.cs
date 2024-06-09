@@ -13,7 +13,7 @@ public class Program
     private static FileStream logFileStream;
     private static StreamWriter logFileWriter;
 
-    public const string logFilePath = @"C:\console.log";
+    public static string logFilePath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\logi\console.log";
 
     public static void Main(string[] args)
     {
