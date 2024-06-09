@@ -17,11 +17,11 @@ public class Program
 
     public static void Main(string[] args)
     {
-        logFileStream = new FileStream(logFilePath, FileMode.Create);
+        logFileStream = new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
         logFileWriter = new StreamWriter(logFileStream) { AutoFlush = true };
 
-        Console.SetOut(logFileWriter);
-        Console.SetError(logFileWriter);
+        Console.SetOut(new AnsiStrippingTextWriter(logFileWriter));
+        Console.SetError(new AnsiStrippingTextWriter(logFileWriter));
 
         try
         {
