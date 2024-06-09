@@ -4,20 +4,21 @@ using Server.Services;
 
 namespace Server.Controllers;
 
-public class ClientsController(ManageClientService manageClientService) : Controller
+public class ClientsController(ManageClientService manageClientService, HandlerService handlerService) : Controller
 {
     private readonly ManageClientService _manageClientService = manageClientService;
+    private readonly HandlerService _handlerService = handlerService;
 
     public IActionResult Index()
     {
-        var clients = HandlerService.ConnectedClients.Keys.ToList();
+        var clients = _handlerService.connectedClients.Keys.ToList();
 
         return View(clients);
     }
 
     public IActionResult Individual(string id)
     {
-        var client = HandlerService.ConnectedClients.Keys.FirstOrDefault(c => c.Id == id);
+        var client = _handlerService.connectedClients.Keys.FirstOrDefault(c => c.Id == id);
         if (client == null)
         {
             return NotFound();
@@ -38,7 +39,7 @@ public class ClientsController(ManageClientService manageClientService) : Contro
 
     public async Task<IActionResult> Disconnect(string id)
     {
-        var client = HandlerService.ConnectedClients.Keys.FirstOrDefault(c => c.Id == id);
+        var client = _handlerService.connectedClients.Keys.FirstOrDefault(c => c.Id == id);
         if (client == null)
         {
             return NotFound();

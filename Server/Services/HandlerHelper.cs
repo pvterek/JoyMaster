@@ -1,29 +1,36 @@
-﻿using Server.Models;
-using static Server.Services.HandlerService; //get rid of it
+﻿using Grpc.Core;
+using Server.Models;
+using Server.Protos;
+using Server.Services.Interfaces;
+using System.Collections.Concurrent;
 
 namespace Server.Services;
 
-public class HandlerHelper
+public class HandlerHelper : IHandlerHelper
 {
-    //public static byte[] GetLatestFrame()
-    //{
-    //    byte[] helperFrame = null;
-    //
-    //    if (Frames.IsEmpty)
-    //    {
-    //        return null;
-    //    }
-    //    else if (Frames.TryDequeue(out var frame))
-    //    {
-    //        helperFrame = frame;
-    //        return frame;
-    //    }
-    //
-    //    return helperFrame;
-    //}
-
-    public static ClientModel? GetClientByIp(string addressIp)
+    public ClientModel? GetClientByIp(ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> clientsList, string clientIpAddress)
     {
-        return ConnectedClients.Keys.SingleOrDefault(client => client.AddressIp == addressIp);
+        return clientsList.Keys.SingleOrDefault(client => client.AddressIp == clientIpAddress);
+    }
+
+    public void RemoveClientByIp(ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> clientsList, string clientIpAddress, string reason, LoggerService logger)
+    {
+        var client = GetClientByIp(clientsList, clientIpAddress);
+
+        if (client == null)
+        {
+            logger.LogAndSendMessage("System", $"No client found with IP address: {clientIpAddress}", LogLevel.Warning);
+        }
+        else
+        {
+            if (clientsList.TryRemove(client, out _))
+            {
+                logger.LogAndSendMessage(client.Id, $"Client {clientIpAddress} disconnected: {reason}", LogLevel.Information);
+            }
+            else
+            {
+                logger.LogAndSendMessage("System", $"Failed to remove client with IP address: {clientIpAddress}", LogLevel.Warning);
+            }
+        }
     }
 }

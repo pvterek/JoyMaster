@@ -1,16 +1,13 @@
-﻿using Server.Models;
+﻿using Server.Constants;
+using Server.Models;
 using Server.Protos;
-using static Server.Services.HandlerService; //get rid of it
 
 namespace Server.Services;
 
-public class ManageClientService(ILogger<ManageClientService> logger, ConsoleService consoleService)
+public class ManageClientService(ILogger<ManageClientService> logger, ConsoleService consoleService, HandlerService handlerService)
 {
     private readonly LoggerService _loggerService = new(logger, consoleService);
-
-    //move to separate class
-    private const string SendCommandPrompt = "send";
-    private const string EndCommandPrompt = "end";
+    private readonly HandlerService _handlerService = handlerService;
 
     public async Task ProcessCommand(CommandModel commandModel)
     {
@@ -37,10 +34,10 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
 
         switch (command.ToLower())
         {
-            case EndCommandPrompt:
+            case AppConstants.EndCommand:
                 await SendCommand(commandModel.ClientId, command);
                 break;
-            case SendCommandPrompt:
+            case AppConstants.SendCommand:
                 await SendCommand(commandModel.ClientId, parameters);
                 break;
             default:
@@ -51,7 +48,7 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
 
     private async Task SendCommand(string clientId, string parameters)
     {
-        var existingClient = ConnectedClients.FirstOrDefault(pair => pair.Key.Id == clientId);
+        var existingClient = _handlerService.connectedClients.FirstOrDefault(pair => pair.Key.Id == clientId);
         if (existingClient.Key == null)
         {
             _loggerService.LogAndSendMessage(clientId, $"No client found for: {clientId}", LogLevel.Warning);
