@@ -1,3 +1,13 @@
-﻿@model string
+﻿@{
+    ViewData["Title"] = "Console logs";
+    string? logContent = Model as string;
+}
 
-<h1>Console logs</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>@ViewData["Title"]</h2>
+    <button class="btn btn-primary" onclick="location.reload();">Refresh</button>
+</div>
+
+<pre>
+    @Html.Raw(logContent)
+</pre>

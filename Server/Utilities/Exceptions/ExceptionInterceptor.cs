@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
 
-namespace Server.Exceptions;
+namespace Server.Utilities.Exceptions;
 
 public class ExceptionInterceptor(ILogger<ExceptionInterceptor> logger) : Interceptor
 {

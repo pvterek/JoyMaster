@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Exceptions;
-using Server.Hubs;
 using Server.Services;
 using Server.Services.Interfaces;
+using Server.Utilities;
+using Server.Utilities.Exceptions;
+using Server.Utilities.Hubs;
 
 namespace Server;
 
@@ -17,11 +18,11 @@ public class Program
 
     public static void Main(string[] args)
     {
-        logFileStream = new FileStream(logFilePath, FileMode.Create);
+        logFileStream = new FileStream(logFilePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
         logFileWriter = new StreamWriter(logFileStream) { AutoFlush = true };
 
-        Console.SetOut(logFileWriter);
-        Console.SetError(logFileWriter);
+        Console.SetOut(new AnsiStrippingTextWriter(logFileWriter));
+        Console.SetError(new AnsiStrippingTextWriter(logFileWriter));
 
         try
         {

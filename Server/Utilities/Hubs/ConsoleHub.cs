@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Server.Hubs;
+namespace Server.Utilities.Hubs;
 
 public class ConsoleHub() : Hub
 {

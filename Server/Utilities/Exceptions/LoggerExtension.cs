@@ -1,4 +1,4 @@
-﻿namespace Server.Exceptions;
+﻿namespace Server.Utilities.Exceptions;
 
 public static class LoggerExtension
 {

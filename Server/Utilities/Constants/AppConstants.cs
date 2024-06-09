@@ -1,4 +1,4 @@
-﻿namespace Server.Constants;
+﻿namespace Server.Utilities.Constants;
 
 internal static class AppConstants
 {
