@@ -11,8 +11,6 @@ internal class ClientService
     private readonly string ClientName = Environment.UserName;
     private readonly string Id = Guid.NewGuid().ToString();
 
-    private const string EndCommand = "end";
-
     public async Task Run()
     {
         var client = ConfigureClient();
@@ -77,7 +75,7 @@ internal class ClientService
     {
         switch (command)
         {
-            case EndCommand:
+            case AppConstants.EndCommand:
                 await requestStream.CompleteAsync();
                 break;
             default:

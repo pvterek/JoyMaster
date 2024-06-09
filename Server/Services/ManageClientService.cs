@@ -1,4 +1,5 @@
-﻿using Server.Models;
+﻿using Server.Constants;
+using Server.Models;
 using Server.Protos;
 
 namespace Server.Services;
@@ -7,10 +8,6 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
 {
     private readonly LoggerService _loggerService = new(logger, consoleService);
     private readonly HandlerService _handlerService = handlerService;
-
-    //move to separate class
-    private const string SendCommandPrompt = "send";
-    private const string EndCommandPrompt = "end";
 
     public async Task ProcessCommand(CommandModel commandModel)
     {
@@ -37,10 +34,10 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
 
         switch (command.ToLower())
         {
-            case EndCommandPrompt:
+            case AppConstants.EndCommand:
                 await SendCommand(commandModel.ClientId, command);
                 break;
-            case SendCommandPrompt:
+            case AppConstants.SendCommand:
                 await SendCommand(commandModel.ClientId, parameters);
                 break;
             default:
