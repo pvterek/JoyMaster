@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Server.Models;
 using Server.Services;
+using Server.Utilities.Constants;
 
 namespace Server.Controllers;
 
@@ -48,7 +49,7 @@ public class ClientsController(ManageClientService manageClientService, HandlerS
         CommandModel endCommand = new()
         {
             ClientId = id,
-            Command = "end"
+            Command = AppConstants.EndCommand
         };
         await _manageClientService.ProcessCommand(endCommand);
         await Task.Delay(100);

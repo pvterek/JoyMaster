@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 
-namespace Server.Exceptions;
+namespace Server.Utilities.Exceptions;
 
 public static class ExceptionHelpers
 {

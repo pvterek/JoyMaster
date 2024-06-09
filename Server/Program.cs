@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
-using Server.Exceptions;
-using Server.Hubs;
 using Server.Services;
 using Server.Services.Interfaces;
+using Server.Utilities;
+using Server.Utilities.Exceptions;
+using Server.Utilities.Hubs;
 
 namespace Server;
 

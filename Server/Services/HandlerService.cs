@@ -1,8 +1,8 @@
 ﻿using Grpc.Core;
-using Server.Exceptions;
 using Server.Models;
 using Server.Protos;
 using Server.Services.Interfaces;
+using Server.Utilities.Exceptions;
 using System.Collections.Concurrent;
 
 namespace Server.Services;

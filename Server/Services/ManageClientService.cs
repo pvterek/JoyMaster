@@ -1,6 +1,6 @@
-﻿using Server.Constants;
-using Server.Models;
+﻿using Server.Models;
 using Server.Protos;
+using Server.Utilities.Constants;
 
 namespace Server.Services;
 
