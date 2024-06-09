@@ -4,6 +4,7 @@ using Server.Data;
 using Server.Exceptions;
 using Server.Hubs;
 using Server.Services;
+using Server.Services.Interfaces;
 
 namespace Server;
 
@@ -59,6 +60,7 @@ public class Program
         builder.Services.AddSingleton<ConsoleService>();
         builder.Services.AddSingleton<HandlerService>();
         builder.Services.AddSingleton<ManageClientService>();
+        builder.Services.AddSingleton<IHandlerHelper, HandlerHelper>();
 
         builder.Services.AddSignalR();
     }

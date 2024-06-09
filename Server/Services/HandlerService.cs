@@ -2,18 +2,19 @@
 using Server.Exceptions;
 using Server.Models;
 using Server.Protos;
+using Server.Services.Interfaces;
 using System.Collections.Concurrent;
-using static Server.Services.HandlerHelper; //get rid of it
 
 namespace Server.Services;
 
-public class HandlerService(ILogger<HandlerService> logger, ConsoleService consoleService) : Handler.HandlerBase
+public class HandlerService(ILogger<HandlerService> logger, ConsoleService consoleService, IHandlerHelper handlerHelper) : Handler.HandlerBase
 {
     private readonly ILogger<HandlerService> _logger = logger;
+    private readonly IHandlerHelper _handlerHelper = handlerHelper;
     private readonly LoggerService _loggerService = new(logger, consoleService);
 
-    public static readonly ConcurrentQueue<byte[]> Frames = new();
-    public static readonly ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> ConnectedClients = new();
+    public readonly ConcurrentQueue<byte[]> frames = new();
+    public readonly ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> connectedClients = new();
 
     public override async Task CommandStream(IAsyncStreamReader<InitRequest> requestStream, IServerStreamWriter<CommandReply> responseStream, ServerCallContext context)
     {
@@ -33,7 +34,7 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
     {
         await foreach (var frame in requestStream.ReadAllAsync())
         {
-            Frames.Enqueue(frame.Image.ToByteArray());
+            frames.Enqueue(frame.Image.ToByteArray());
         }
     }
 
@@ -45,7 +46,7 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
         {
             if (isFirstRequest)
             {
-                var existingClient = GetClientByIp(clientAddress);
+                var existingClient = _handlerHelper.GetClientByIp(connectedClients, clientAddress);
 
                 if (existingClient == null)
                 {
@@ -57,7 +58,7 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
                         LastConnectionDate = DateTime.UtcNow
                     };
 
-                    if (ConnectedClients.TryAdd(currentClient, responseStream))
+                    if (connectedClients.TryAdd(currentClient, responseStream))
                     {
                         _loggerService.LogAndSendMessage(currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
                         isFirstRequest = false;
@@ -76,39 +77,18 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
             _loggerService.LogAndSendMessage(request.Id, request.Message, LogLevel.Information);
         }
 
-        RemoveClientByIp(clientAddress, "connection finished");
+        _handlerHelper.RemoveClientByIp(connectedClients, clientAddress, "connection finished", _loggerService);
     }
 
     private void HandleException(Exception ex, string clientAddress, ServerCallContext context)
     {
         if (context.CancellationToken.IsCancellationRequested)
         {
-            RemoveClientByIp(clientAddress, "due to cancellation");
+            _handlerHelper.RemoveClientByIp(connectedClients, clientAddress, "due to cancellation", _loggerService);
         }
         else
         {
             _logger.LogErrorWithTimestamp($"[{clientAddress}] - {ex.Message}");
-        }
-    }
-
-    private void RemoveClientByIp(string clientAddress, string reason) //move to helper class
-    {
-        var client = GetClientByIp(clientAddress);
-
-        if (client == null)
-        {
-            _loggerService.LogAndSendMessage("System", $"No client found with IP address: {clientAddress}", LogLevel.Warning);
-        }
-        else
-        {
-            if (ConnectedClients.TryRemove(client, out _))
-            {
-                _loggerService.LogAndSendMessage(client.Id, $"Client {clientAddress} disconnected: {reason}", LogLevel.Information);
-            }
-            else
-            {
-                _loggerService.LogAndSendMessage("System", $"Failed to remove client with IP address: {clientAddress}", LogLevel.Warning);
-            }
         }
     }
 }
