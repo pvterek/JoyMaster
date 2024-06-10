@@ -58,7 +58,7 @@ public class Program
             options.MaxSendMessageSize = 262144;
         });
 
-        builder.Services.AddSingleton<ConsoleService>();
+        builder.Services.AddSingleton<ILoggerService, LoggerService>();
         builder.Services.AddSingleton<HandlerService>();
         builder.Services.AddSingleton<ManageClientService>();
         builder.Services.AddSingleton<IHandlerHelper, HandlerHelper>();

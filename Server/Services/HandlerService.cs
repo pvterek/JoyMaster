@@ -7,11 +7,11 @@ using System.Collections.Concurrent;
 
 namespace Server.Services;
 
-public class HandlerService(ILogger<HandlerService> logger, ConsoleService consoleService, IHandlerHelper handlerHelper) : Handler.HandlerBase
+public class HandlerService(ILogger<HandlerService> logger, ILoggerService loggerService, IHandlerHelper handlerHelper) : Handler.HandlerBase
 {
     private readonly ILogger<HandlerService> _logger = logger;
     private readonly IHandlerHelper _handlerHelper = handlerHelper;
-    private readonly LoggerService _loggerService = new(logger, consoleService);
+    private readonly ILoggerService _loggerService = loggerService;
 
     public readonly ConcurrentQueue<byte[]> frames = new();
     public readonly ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> connectedClients = new();
@@ -26,7 +26,7 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
         }
         catch (Exception ex)
         {
-            HandleException(ex, clientAddress, context);
+            await HandleException(ex, clientAddress, context);
         }
     }
 
@@ -60,7 +60,7 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
 
                     if (connectedClients.TryAdd(currentClient, responseStream))
                     {
-                        _loggerService.LogAndSendMessage(currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
+                        await _loggerService.LogAndSendMessage(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
                         isFirstRequest = false;
                     }
                     else
@@ -70,21 +70,21 @@ public class HandlerService(ILogger<HandlerService> logger, ConsoleService conso
                 }
                 else
                 {
-                    _loggerService.LogAndSendMessage(existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
+                    await _loggerService.LogAndSendMessage(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
                 }
             }
 
-            _loggerService.LogAndSendMessage(request.Id, request.Message, LogLevel.Information);
+            await _loggerService.LogAndSendMessage(_logger, request.Id, request.Message, LogLevel.Information);
         }
 
-        _handlerHelper.RemoveClientByIp(connectedClients, clientAddress, "connection finished", _loggerService);
+        await _handlerHelper.RemoveClientByIpAsync(connectedClients, clientAddress, "connection finished");
     }
 
-    private void HandleException(Exception ex, string clientAddress, ServerCallContext context)
+    private async Task HandleException(Exception ex, string clientAddress, ServerCallContext context)
     {
         if (context.CancellationToken.IsCancellationRequested)
         {
-            _handlerHelper.RemoveClientByIp(connectedClients, clientAddress, "due to cancellation", _loggerService);
+            await _handlerHelper.RemoveClientByIpAsync(connectedClients, clientAddress, "due to cancellation");
         }
         else
         {

@@ -1,27 +1,50 @@
-﻿using Server.Services.Interfaces;
+﻿using Microsoft.AspNetCore.SignalR;
+using Server.Models;
+using Server.Services.Interfaces;
+using Server.Utilities.Hubs;
 
 namespace Server.Services;
 
-public class LoggerService(ILogger logger, ConsoleService consoleService) : ILoggerService
+public class LoggerService(IHubContext<ConsoleHub> hubContext) : ILoggerService
 {
-    private readonly ILogger _logger = logger;
-    private readonly ConsoleService _consoleService = consoleService;
+    private readonly IHubContext<ConsoleHub> _hubContext = hubContext;
 
-    public void LogAndSendMessage(string clientId, string message, LogLevel logLevel)
+    public async Task LogAndSendMessage<T>(ILogger<T> logger, string clientId, string message, LogLevel logLevel)
     {
-        var timestampedMessage = $"[{DateTime.UtcNow:HH:mm:ss}] {message}";
-        _consoleService.SendMessage(clientId, timestampedMessage);
+        var timestampedMessage = FormatMessageWithTimestamp(message);
+        var messageModel = CreateMessageModel(clientId, timestampedMessage);
 
+        await SendMessage(messageModel);
+        LogMessage(logger, timestampedMessage, logLevel);
+    }
+
+    private async Task SendMessage(MessageModel messageModel)
+    {
+        await _hubContext.Clients.All.SendAsync("ReceiveMessage", messageModel);
+    }
+
+    private string FormatMessageWithTimestamp(string message)
+    {
+        return $"[{DateTime.UtcNow:HH:mm:ss}] {message}";
+    }
+
+    private MessageModel CreateMessageModel(string clientId, string message)
+    {
+        return new MessageModel { ClientId = clientId, Message = message };
+    }
+
+    private void LogMessage<T>(ILogger<T> logger, string message, LogLevel logLevel)
+    {
         switch (logLevel)
         {
             case LogLevel.Information:
-                _logger.LogInformation(timestampedMessage);
+                logger.LogInformation(message);
                 break;
             case LogLevel.Warning:
-                _logger.LogWarning(timestampedMessage);
+                logger.LogWarning(message);
                 break;
             case LogLevel.Error:
-                _logger.LogError(timestampedMessage);
+                logger.LogError(message);
                 break;
         }
     }

@@ -2,5 +2,5 @@
 
 public interface ILoggerService
 {
-    public void LogAndSendMessage(string clientId, string message, LogLevel logLevel);
+    public Task LogAndSendMessage<T>(ILogger<T> logger, string clientId, string message, LogLevel logLevel);
 }
