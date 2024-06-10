@@ -19,7 +19,7 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
 
         string command;
         string parameters = string.Empty;
-        string message = commandModel.Command;
+        string message = commandModel.Message;
         int firstSpaceIndex = message.IndexOf(' ');
 
         if (firstSpaceIndex == -1)
@@ -41,7 +41,7 @@ public class ManageClientService(ILogger<ManageClientService> logger, ConsoleSer
                 await SendCommand(commandModel.ClientId, parameters);
                 break;
             default:
-                _loggerService.LogAndSendMessage(commandModel.ClientId, $"Invalid command: {commandModel.Command}", LogLevel.Warning);
+                _loggerService.LogAndSendMessage(commandModel.ClientId, $"Invalid command: {commandModel.Message}", LogLevel.Warning);
                 break;
         }
     }
