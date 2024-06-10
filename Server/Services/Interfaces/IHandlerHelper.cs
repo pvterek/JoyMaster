@@ -9,6 +9,6 @@ namespace Server.Services.Interfaces
     {
         public ClientModel? GetClientByIp(ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> clientsList, string clientIpAddress);
 
-        public void RemoveClientByIp(ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> clientsList, string clientIpAddress, string reason, LoggerService logger);
+        public Task RemoveClientByIpAsync(ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> clientsList, string clientIpAddress, string reason);
     }
 }
