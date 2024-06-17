@@ -1,7 +1,6 @@
 ﻿using Grpc.Core;
 using Server.Protos;
 using Server.Services.Interfaces;
-using Server.Utilities.Exceptions;
 using Server.Utilities.Logs;
 
 namespace Server.Services;
@@ -66,7 +65,7 @@ internal class HandlerService(
         }
         else
         {
-            _logger.LogErrorWithTimestamp($"[{_clientAddress}] - {ex.Message}");
+            _logger.LogError($"[{_clientAddress}] - {ex.Message}");
         }
     }
 }

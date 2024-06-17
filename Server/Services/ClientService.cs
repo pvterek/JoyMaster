@@ -2,7 +2,6 @@
 using Server.Models;
 using Server.Protos;
 using Server.Services.Interfaces;
-using Server.Utilities.Exceptions;
 using Server.Utilities.Logs;
 
 namespace Server.Services;
@@ -51,7 +50,7 @@ internal class ClientService(
             return;
         }
 
-        _logger.LogErrorWithTimestamp($"Failed adding {currentClient.Name} [{currentClient.AddressIp}] to list.");
+        _logger.LogError($"Failed adding {currentClient.Name} [{currentClient.AddressIp}] to list.");
     }
 
     private ClientModel CreateClientModel(string clientId, string clientName, string clientAddress)
