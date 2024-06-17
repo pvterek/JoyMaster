@@ -2,24 +2,25 @@
 using Server.Protos;
 using Server.Services.Interfaces;
 using Server.Utilities.Constants;
+using Server.Utilities.Logs;
 
 namespace Server.Services;
 
-internal class ManageClientService(
+public class ManageClientService(
     ILogger<ManageClientService> logger,
-    ILoggerService loggerService,
+    LoggerService loggerService,
     IClientDictionary clientDictionary
     )
 {
     private readonly ILogger<ManageClientService> _logger = logger;
-    private readonly ILoggerService _loggerService = loggerService;
+    private readonly LoggerService _loggerService = loggerService;
     private readonly IClientDictionary _clientDictionary = clientDictionary;
 
     public async Task ProcessCommand(MessageModel commandModel)
     {
         if (string.IsNullOrEmpty(commandModel.Message))
         {
-            await _loggerService.LogAndSendMessage(_logger, commandModel.ClientId, "Provided empty command!", LogLevel.Warning);
+            await _loggerService.SendMessageWithLogAsync(_logger, commandModel.ClientId, "Provided empty command!", LogLevel.Warning);
             return;
         }
 
@@ -47,7 +48,7 @@ internal class ManageClientService(
                 await SendCommand(commandModel.ClientId, parameters);
                 break;
             default:
-                await _loggerService.LogAndSendMessage(_logger, commandModel.ClientId, $"Invalid command: {commandModel.Message}", LogLevel.Warning);
+                await _loggerService.SendMessageWithLogAsync(_logger, commandModel.ClientId, $"Invalid command: {commandModel.Message}", LogLevel.Warning);
                 break;
         }
     }
@@ -57,7 +58,7 @@ internal class ManageClientService(
         var existingClient = _clientDictionary.Clients.FirstOrDefault(pair => pair.Key.Id == clientId);
         if (existingClient.Key == null)
         {
-            await _loggerService.LogAndSendMessage(_logger, clientId, $"No client found for: {clientId}", LogLevel.Warning);
+            await _loggerService.SendMessageWithLogAsync(_logger, clientId, $"No client found for: {clientId}", LogLevel.Warning);
         }
 
         var response = new CommandReply
@@ -67,6 +68,6 @@ internal class ManageClientService(
 
         await existingClient.Value.WriteAsync(response);
 
-        await _loggerService.LogAndSendMessage(_logger, clientId, $"Command '{parameters}' sent to client {clientId}.", LogLevel.Information);
+        await _loggerService.SendMessageWithLogAsync(_logger, clientId, $"Command '{parameters}' sent to client {clientId}.", LogLevel.Information);
     }
 }

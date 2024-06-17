@@ -3,17 +3,18 @@ using Server.Models;
 using Server.Protos;
 using Server.Services.Interfaces;
 using Server.Utilities.Exceptions;
+using Server.Utilities.Logs;
 
 namespace Server.Services;
 
 internal class ClientService(
     ILogger<ClientService> logger,
-    ILoggerService loggerService,
+    LoggerService loggerService,
     IClientDictionary clientDictionary
     ) : IClientService
 {
     private readonly ILogger<ClientService> _logger = logger;
-    private readonly ILoggerService _loggerService = loggerService;
+    private readonly LoggerService _loggerService = loggerService;
     private readonly IClientDictionary _clientDictionary = clientDictionary;
 
     public ClientModel? GetClientByIp(string clientIpAddress)
@@ -27,17 +28,17 @@ internal class ClientService(
 
         if (client == null)
         {
-            await _loggerService.LogAndSendMessage(_logger, "System", $"No client found with IP address: {clientIpAddress}", LogLevel.Warning);
+            await _loggerService.SendMessageWithLogAsync(_logger, "System", $"No client found with IP address: {clientIpAddress}", LogLevel.Warning);
             return;
         }
 
         if (_clientDictionary.Clients.TryRemove(client, out _))
         {
-            await _loggerService.LogAndSendMessage(_logger, client.Id, $"Client {clientIpAddress} disconnected: {reason}", LogLevel.Information);
+            await _loggerService.SendMessageWithLogAsync(_logger, client.Id, $"Client {clientIpAddress} disconnected: {reason}", LogLevel.Information);
             return;
         }
 
-        await _loggerService.LogAndSendMessage(_logger, client.Id, $"Failed to remove client with IP address: {clientIpAddress}", LogLevel.Warning);
+        await _loggerService.SendMessageWithLogAsync(_logger, client.Id, $"Failed to remove client with IP address: {clientIpAddress}", LogLevel.Warning);
     }
 
     public async Task RegisterClientAsync(IServerStreamWriter<CommandReply> responseStream, string clientId, string clientName, string clientAddress)
@@ -46,7 +47,7 @@ internal class ClientService(
 
         if (_clientDictionary.Clients.TryAdd(currentClient, responseStream))
         {
-            await _loggerService.LogAndSendMessage(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
+            await _loggerService.SendMessageWithLogAsync(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
             return;
         }
 

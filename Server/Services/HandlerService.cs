@@ -2,18 +2,19 @@
 using Server.Protos;
 using Server.Services.Interfaces;
 using Server.Utilities.Exceptions;
+using Server.Utilities.Logs;
 
 namespace Server.Services;
 
 internal class HandlerService(
     ILogger<HandlerService> logger,
-    ILoggerService loggerService,
+    LoggerService loggerService,
     IClientService clientService
     ) : Handler.HandlerBase
 {
     private readonly ILogger<HandlerService> _logger = logger;
     private readonly IClientService _clientService = clientService;
-    private readonly ILoggerService _loggerService = loggerService;
+    private readonly LoggerService _loggerService = loggerService;
     private string _clientAddress = null!;
 
     public override async Task CommandStream(IAsyncStreamReader<InitRequest> requestStream, IServerStreamWriter<CommandReply> responseStream, ServerCallContext context)
@@ -38,7 +39,7 @@ internal class HandlerService(
         {
             if (!isFirstRequest)
             {
-                await _loggerService.LogAndSendMessage(_logger, request.Id, request.Message, LogLevel.Information);
+                await _loggerService.SendMessageWithLogAsync(_logger, request.Id, request.Message, LogLevel.Information);
                 continue;
             }
 
@@ -46,7 +47,7 @@ internal class HandlerService(
 
             if (existingClient != null)
             {
-                await _loggerService.LogAndSendMessage(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
+                await _loggerService.SendMessageWithLogAsync(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
                 break;
             }
 

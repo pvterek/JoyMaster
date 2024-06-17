@@ -6,6 +6,7 @@ using Server.Services.Interfaces;
 using Server.Utilities;
 using Server.Utilities.Exceptions;
 using Server.Utilities.Hubs;
+using Server.Utilities.Logs;
 
 namespace Server;
 
@@ -59,8 +60,10 @@ public class Program
         });
 
         builder.Services.AddSingleton<IClientDictionary, ClientDictionary>();
-        builder.Services.AddSingleton<ILoggerService, LoggerService>();
 
+        builder.Services.AddScoped<IMessageSender, MessageSender>();
+        builder.Services.AddScoped<LoggerHelper>();
+        builder.Services.AddScoped<LoggerService>();
         builder.Services.AddScoped<HandlerService>();
         builder.Services.AddScoped<ManageClientService>();
         builder.Services.AddScoped<IClientService, ClientService>();
