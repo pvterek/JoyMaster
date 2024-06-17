@@ -5,11 +5,15 @@ using Server.Utilities.Constants;
 
 namespace Server.Services;
 
-public class ManageClientService(ILogger<ManageClientService> logger, ILoggerService loggerService, HandlerService handlerService)
+internal class ManageClientService(
+    ILogger<ManageClientService> logger,
+    ILoggerService loggerService,
+    IClientDictionary clientDictionary
+    )
 {
     private readonly ILogger<ManageClientService> _logger = logger;
     private readonly ILoggerService _loggerService = loggerService;
-    private readonly HandlerService _handlerService = handlerService;
+    private readonly IClientDictionary _clientDictionary = clientDictionary;
 
     public async Task ProcessCommand(MessageModel commandModel)
     {
@@ -50,7 +54,7 @@ public class ManageClientService(ILogger<ManageClientService> logger, ILoggerSer
 
     private async Task SendCommand(string clientId, string parameters)
     {
-        var existingClient = _handlerService.connectedClients.FirstOrDefault(pair => pair.Key.Id == clientId);
+        var existingClient = _clientDictionary.Clients.FirstOrDefault(pair => pair.Key.Id == clientId);
         if (existingClient.Key == null)
         {
             await _loggerService.LogAndSendMessage(_logger, clientId, $"No client found for: {clientId}", LogLevel.Warning);

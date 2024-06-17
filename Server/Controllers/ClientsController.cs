@@ -1,25 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Server.Models;
 using Server.Services;
+using Server.Services.Interfaces;
 using Server.Utilities.Constants;
 
 namespace Server.Controllers;
 
-public class ClientsController(ManageClientService manageClientService, HandlerService handlerService) : Controller
+public class ClientsController(
+    ManageClientService manageClientService,
+    IClientDictionary clientDictionary
+    ) : Controller
 {
     private readonly ManageClientService _manageClientService = manageClientService;
-    private readonly HandlerService _handlerService = handlerService;
+    private readonly IClientDictionary _clientDictionary = clientDictionary;
 
     public IActionResult Index()
     {
-        var clients = _handlerService.connectedClients.Keys.ToList();
+        var clients = _clientDictionary.Clients.Keys.ToList();
 
         return View(clients);
     }
 
     public IActionResult Individual(string id)
     {
-        var client = _handlerService.connectedClients.Keys.FirstOrDefault(c => c.Id == id);
+        var client = _clientDictionary.Clients.Keys.FirstOrDefault(c => c.Id == id);
         if (client == null)
         {
             return NotFound();
@@ -40,7 +44,7 @@ public class ClientsController(ManageClientService manageClientService, HandlerS
 
     public async Task<IActionResult> Disconnect(string id)
     {
-        var client = _handlerService.connectedClients.Keys.FirstOrDefault(c => c.Id == id);
+        var client = _clientDictionary.Clients.Keys.FirstOrDefault(c => c.Id == id);
         if (client == null)
         {
             return NotFound();
