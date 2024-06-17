@@ -8,9 +8,12 @@ public class ConsoleController : Controller
     {
         string logContent = "";
 
-        if (System.IO.File.Exists(Program.logFilePath))
+        string logFileName = $"log{DateTime.Now:yyyyMMdd}.txt";
+        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", logFileName);
+
+        if (System.IO.File.Exists(logFilePath))
         {
-            using var fileStream = new FileStream(Program.logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var fileStream = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             using var streamReader = new StreamReader(fileStream);
             logContent = streamReader.ReadToEnd();
         }

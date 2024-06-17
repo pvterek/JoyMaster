@@ -16,7 +16,7 @@ public class LoggerService(
         var messageModel = _loggerHelper.CreateMessageModel(clientId, timestampedMessage);
 
         await SendMessageAsync(messageModel);
-        LogMessage(logger, timestampedMessage, logLevel);
+        LogMessage(logger, message, logLevel);
     }
 
     public async Task SendMessageAsync(MessageModel messageModel)
