@@ -6,13 +6,14 @@ using Server.Services.Interfaces;
 using Server.Utilities;
 using Server.Utilities.Exceptions;
 using Server.Utilities.Hubs;
+using Server.Utilities.Logs;
 
 namespace Server;
 
 public class Program
 {
-    private static FileStream logFileStream;
-    private static StreamWriter logFileWriter;
+    private static FileStream logFileStream = null!;
+    private static StreamWriter logFileWriter = null!;
 
     public static string logFilePath = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\logi\console.log";
 
@@ -58,10 +59,14 @@ public class Program
             options.MaxSendMessageSize = 262144;
         });
 
-        builder.Services.AddSingleton<ILoggerService, LoggerService>();
-        builder.Services.AddSingleton<HandlerService>();
-        builder.Services.AddSingleton<ManageClientService>();
-        builder.Services.AddSingleton<IHandlerHelper, HandlerHelper>();
+        builder.Services.AddSingleton<IClientDictionary, ClientDictionary>();
+
+        builder.Services.AddScoped<IMessageSender, MessageSender>();
+        builder.Services.AddScoped<LoggerHelper>();
+        builder.Services.AddScoped<LoggerService>();
+        builder.Services.AddScoped<HandlerService>();
+        builder.Services.AddScoped<ManageClientService>();
+        builder.Services.AddScoped<IClientService, ClientService>();
 
         builder.Services.AddSignalR();
     }
