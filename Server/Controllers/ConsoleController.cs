@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Server.Controllers;
 
+[Authorize]
 public class ConsoleController : Controller
 {
     public IActionResult Index()

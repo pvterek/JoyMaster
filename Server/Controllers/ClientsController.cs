@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Server.Models;
 using Server.Services;
 using Server.Services.Interfaces;
@@ -6,6 +7,7 @@ using Server.Utilities.Constants;
 
 namespace Server.Controllers;
 
+[Authorize]
 public class ClientsController(
     ManageClientService manageClientService,
     IClientDictionary clientDictionary
