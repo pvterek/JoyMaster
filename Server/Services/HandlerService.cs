@@ -46,7 +46,7 @@ internal class HandlerService(
 
             if (existingClient != null)
             {
-                await _loggerService.SendMessageWithLogAsync(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
+                await _loggerService.SendMessageWithLogAsync(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.IpAddress}] wanted to connect, but it's already on list!", LogLevel.Information);
                 break;
             }
 

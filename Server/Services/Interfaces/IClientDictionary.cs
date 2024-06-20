@@ -7,5 +7,5 @@ namespace Server.Services.Interfaces;
 
 public interface IClientDictionary
 {
-    ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> Clients { get; }
+    ConcurrentDictionary<Client, IServerStreamWriter<CommandReply>> Clients { get; }
 }

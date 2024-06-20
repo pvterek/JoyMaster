@@ -19,7 +19,7 @@ function sendCommand(clientId) {
     $.ajax({
         type: 'POST',
         url: '/Clients/ExecuteCommand',
-        data: JSON.stringify({ ClientId: clientId, Message: command }),
+        data: JSON.stringify({ ClientId: clientId, MessageContent: command }),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json'
     });

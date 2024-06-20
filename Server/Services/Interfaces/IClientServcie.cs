@@ -6,7 +6,7 @@ namespace Server.Services.Interfaces;
 
 internal interface IClientService
 {
-    ClientModel? GetClientByIp(string clientIpAddress);
+    Client? GetClientByIp(string clientIpAddress);
     Task RemoveClientByIpAsync(string clientIpAddress, string reason);
     Task RegisterClientAsync(IServerStreamWriter<CommandReply> responseStream, string clientId, string clientName, string clientAddress);
 }

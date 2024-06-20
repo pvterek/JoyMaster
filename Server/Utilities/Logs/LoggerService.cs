@@ -19,7 +19,7 @@ public class LoggerService(
         LogMessage(logger, message, logLevel);
     }
 
-    public async Task SendMessageAsync(MessageModel messageModel)
+    public async Task SendMessageAsync(Message messageModel)
     {
         await _messageSender.SendMessageAsync(messageModel);
     }

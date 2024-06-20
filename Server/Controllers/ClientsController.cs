@@ -31,13 +31,13 @@ public class ClientsController(
             return NotFound();
         }
 
-        MessageModel command = new() { ClientId = id };
+        Message command = new() { ClientId = id };
 
         return View(command);
     }
 
     [HttpPost]
-    public async Task<IActionResult> ExecuteCommand([FromBody] MessageModel commandModel)
+    public async Task<IActionResult> ExecuteCommand([FromBody] Message commandModel)
     {
         await _manageClientService.ProcessCommand(commandModel);
 
@@ -52,10 +52,10 @@ public class ClientsController(
             return NotFound();
         }
 
-        MessageModel endCommand = new()
+        Message endCommand = new()
         {
             ClientId = id,
-            Message = AppConstants.EndCommand
+            MessageContent = AppConstants.EndCommand
         };
         await _manageClientService.ProcessCommand(endCommand);
         await Task.Delay(100);

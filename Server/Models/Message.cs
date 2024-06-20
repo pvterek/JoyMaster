@@ -1,8 +1,8 @@
 ﻿namespace Server.Models;
 
-public class MessageModel
+public class Message
 {
     public required string ClientId { get; set; }
 
-    public string? Message { get; set; }
+    public string? MessageContent { get; set; }
 }

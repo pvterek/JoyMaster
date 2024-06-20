@@ -8,5 +8,5 @@ namespace Server.Services;
 
 public class ClientDictionary : IClientDictionary
 {
-    public ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> Clients { get; } = new();
+    public ConcurrentDictionary<Client, IServerStreamWriter<CommandReply>> Clients { get; } = new();
 }

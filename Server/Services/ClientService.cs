@@ -16,9 +16,9 @@ internal class ClientService(
     private readonly LoggerService _loggerService = loggerService;
     private readonly IClientDictionary _clientDictionary = clientDictionary;
 
-    public ClientModel? GetClientByIp(string clientIpAddress)
+    public Client? GetClientByIp(string clientIpAddress)
     {
-        return _clientDictionary.Clients.Keys.SingleOrDefault(client => client.AddressIp == clientIpAddress);
+        return _clientDictionary.Clients.Keys.SingleOrDefault(client => client.IpAddress == clientIpAddress);
     }
 
     public async Task RemoveClientByIpAsync(string clientIpAddress, string reason)
@@ -46,20 +46,20 @@ internal class ClientService(
 
         if (_clientDictionary.Clients.TryAdd(currentClient, responseStream))
         {
-            await _loggerService.SendMessageWithLogAsync(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
+            await _loggerService.SendMessageWithLogAsync(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.IpAddress}] connected successfully!", LogLevel.Information);
             return;
         }
 
-        _logger.LogError($"Failed adding {currentClient.Name} [{currentClient.AddressIp}] to list.");
+        _logger.LogError($"Failed adding {currentClient.Name} [{currentClient.IpAddress}] to list.");
     }
 
-    private ClientModel CreateClientModel(string clientId, string clientName, string clientAddress)
+    private Client CreateClientModel(string clientId, string clientName, string clientAddress)
     {
-        return new ClientModel
+        return new Client
         {
             Id = clientId,
             Name = clientName,
-            AddressIp = clientAddress,
+            IpAddress = clientAddress,
             LastConnectionDate = DateTime.UtcNow
         };
     }

@@ -16,9 +16,9 @@ public class ManageClientService(
     private readonly LoggerService _loggerService = loggerService;
     private readonly IClientDictionary _clientDictionary = clientDictionary;
 
-    public async Task ProcessCommand(MessageModel commandModel)
+    public async Task ProcessCommand(Message commandModel)
     {
-        if (string.IsNullOrEmpty(commandModel.Message))
+        if (string.IsNullOrEmpty(commandModel.MessageContent))
         {
             await _loggerService.SendMessageWithLogAsync(_logger, commandModel.ClientId, "Provided empty command!", LogLevel.Warning);
             return;
@@ -26,7 +26,7 @@ public class ManageClientService(
 
         string command;
         string parameters = string.Empty;
-        string message = commandModel.Message;
+        string message = commandModel.MessageContent;
         int firstSpaceIndex = message.IndexOf(' ');
 
         if (firstSpaceIndex == -1)
@@ -48,7 +48,7 @@ public class ManageClientService(
                 await SendCommand(commandModel.ClientId, parameters);
                 break;
             default:
-                await _loggerService.SendMessageWithLogAsync(_logger, commandModel.ClientId, $"Invalid command: {commandModel.Message}", LogLevel.Warning);
+                await _loggerService.SendMessageWithLogAsync(_logger, commandModel.ClientId, $"Invalid command: {commandModel.MessageContent}", LogLevel.Warning);
                 break;
         }
     }

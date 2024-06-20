@@ -1,4 +1,4 @@
-﻿@model List<Server.Models.ClientModel>
+﻿@model List<Server.Models.Client>
 
 @{
     ViewData["Title"] = "Clients list";
@@ -20,7 +20,7 @@
             <tr>
                 <td>@client.Id</td>
                 <td>@client.Name</td>
-                <td>@client.AddressIp</td>
+                <td>@client.IpAddress</td>
                 <td>@client.LastConnectionDate</td>
                 <td>
                     <a asp-action="Individual" asp-route-id="@client.Id" class="btn btn-primary">Take control</a>
