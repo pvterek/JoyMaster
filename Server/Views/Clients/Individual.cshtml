@@ -1,16 +1,16 @@
-﻿@model Server.Models.MessageModel
+﻿@model Server.Models.Message
 
 @{
     ViewData["Title"] = "Command executor";
 }
 
-<h5>@Model.ClientId</h5>
+<h5>@Model.ConnectionGuid</h5>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/signalr/dist/browser/signalr.min.js"></script>
 <script src="~/js/clientOutput.js"></script>
 
-<input type="hidden" id="clientId" value="@Model.ClientId" />
+<input type="hidden" id="connectionGuid" value="@Model.ConnectionGuid" />
 
 <div style="padding-top: 20px; display: flex; justify-content: center;">
     <div id="clientDesktop" style="height: 400px; width: 600px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; ">
@@ -24,6 +24,6 @@
 
 <div class="form-group d-flex justify-content-center">
     <input type="text" class="form-control mr-2" id="command" />
-    <button type="button" class="btn btn-primary" onclick="sendCommand('@Model.ClientId'); $('#command').val('');">Send</button>
+    <button type="button" class="btn btn-primary" onclick="sendCommand('@Model.ConnectionGuid'); $('#command').val('');">Send</button>
 </div>
 

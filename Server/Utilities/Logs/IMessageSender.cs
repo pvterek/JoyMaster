@@ -4,5 +4,5 @@ namespace Server.Utilities.Logs;
 
 public interface IMessageSender
 {
-    Task SendMessageAsync(MessageModel messageModel);
+    Task SendMessageAsync(Message messageModel);
 }

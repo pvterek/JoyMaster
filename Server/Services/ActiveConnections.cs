@@ -6,7 +6,7 @@ using System.Collections.Concurrent;
 
 namespace Server.Services;
 
-public class ClientDictionary : IClientDictionary
+public class ActiveConnections : IActiveConnections
 {
-    public ConcurrentDictionary<ClientModel, IServerStreamWriter<CommandReply>> Clients { get; } = new();
+    public ConcurrentDictionary<Connection, IServerStreamWriter<Response>> Connections { get; } = new();
 }

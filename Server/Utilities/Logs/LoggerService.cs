@@ -10,16 +10,16 @@ public class LoggerService(
     private readonly IMessageSender _messageSender = messageSender;
     private readonly LoggerHelper _loggerHelper = loggerHelper;
 
-    public async Task SendMessageWithLogAsync<T>(ILogger<T> logger, string clientId, string message, LogLevel logLevel)
+    public async Task SendLogAsync<T>(ILogger<T> logger, string connectionGuid, string message, LogLevel logLevel)
     {
         var timestampedMessage = _loggerHelper.FormatMessageWithTimestamp(message);
-        var messageModel = _loggerHelper.CreateMessageModel(clientId, timestampedMessage);
+        var messageModel = _loggerHelper.CreateMessageModel(connectionGuid, timestampedMessage);
 
         await SendMessageAsync(messageModel);
         LogMessage(logger, message, logLevel);
     }
 
-    public async Task SendMessageAsync(MessageModel messageModel)
+    public async Task SendMessageAsync(Message messageModel)
     {
         await _messageSender.SendMessageAsync(messageModel);
     }

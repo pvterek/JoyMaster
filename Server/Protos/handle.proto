@@ -4,18 +4,21 @@ option csharp_namespace = "Server.Protos";
 
 package handle;
 
+import "google/protobuf/wrappers.proto";
+
 service Handler {
-  rpc CommandStream (stream InitRequest) returns (stream CommandReply);
+  rpc CommandStream (stream Request) returns (stream Response);
   rpc StreamDesktop (stream DesktopFrame) returns (stream Empty);
 }
 
-message InitRequest {
+message Request {
   string id = 1;
-  string name = 2;
-  string message = 3;
+  google.protobuf.StringValue name = 2;
+  google.protobuf.StringValue message = 3;
+  bool isInitial = 4;
 }
 
-message CommandReply {
+message Response {
   string message = 1;
 }
 

@@ -1,66 +1,35 @@
-﻿using Grpc.Core;
-using Server.Models;
-using Server.Protos;
-using Server.Services.Interfaces;
-using Server.Utilities.Logs;
+﻿using Server.Models;
+using Server.Repository;
 
 namespace Server.Services;
 
-internal class ClientService(
-    ILogger<ClientService> logger,
-    LoggerService loggerService,
-    IClientDictionary clientDictionary
-    ) : IClientService
+public class ClientService(
+    IClientRepository clientRepository,
+    ILogger<ClientService> logger)
 {
+    private readonly IClientRepository _clientRepository = clientRepository;
     private readonly ILogger<ClientService> _logger = logger;
-    private readonly LoggerService _loggerService = loggerService;
-    private readonly IClientDictionary _clientDictionary = clientDictionary;
 
-    public ClientModel? GetClientByIp(string clientIpAddress)
+    public async Task<Client?> GetClientAsync(string clientName, string clientIpAddress)
     {
-        return _clientDictionary.Clients.Keys.SingleOrDefault(client => client.AddressIp == clientIpAddress);
+        return await _clientRepository.GetAsync(clientName, clientIpAddress);
     }
 
-    public async Task RemoveClientByIpAsync(string clientIpAddress, string reason)
+    public async Task<Client> RegisterClientAsync(string clientName, string clientIpAddress)
     {
-        var client = GetClientByIp(clientIpAddress);
+        var client = CreateClientEntity(clientName, clientIpAddress);
 
-        if (client == null)
-        {
-            await _loggerService.SendMessageWithLogAsync(_logger, "System", $"No client found with IP address: {clientIpAddress}", LogLevel.Warning);
-            return;
-        }
+        await _clientRepository.AddAsync(client);
 
-        if (_clientDictionary.Clients.TryRemove(client, out _))
-        {
-            await _loggerService.SendMessageWithLogAsync(_logger, client.Id, $"Client {clientIpAddress} disconnected: {reason}", LogLevel.Information);
-            return;
-        }
-
-        await _loggerService.SendMessageWithLogAsync(_logger, client.Id, $"Failed to remove client with IP address: {clientIpAddress}", LogLevel.Warning);
+        return client;
     }
 
-    public async Task RegisterClientAsync(IServerStreamWriter<CommandReply> responseStream, string clientId, string clientName, string clientAddress)
+    private Client CreateClientEntity(string name, string ipAddress)
     {
-        var currentClient = CreateClientModel(clientId, clientName, clientAddress);
-
-        if (_clientDictionary.Clients.TryAdd(currentClient, responseStream))
+        return new Client
         {
-            await _loggerService.SendMessageWithLogAsync(_logger, currentClient.Id, $"Client {currentClient.Name} [{currentClient.AddressIp}] connected successfully!", LogLevel.Information);
-            return;
-        }
-
-        _logger.LogError($"Failed adding {currentClient.Name} [{currentClient.AddressIp}] to list.");
-    }
-
-    private ClientModel CreateClientModel(string clientId, string clientName, string clientAddress)
-    {
-        return new ClientModel
-        {
-            Id = clientId,
-            Name = clientName,
-            AddressIp = clientAddress,
-            LastConnectionDate = DateTime.UtcNow
+            Name = name,
+            IpAddress = ipAddress
         };
     }
 }

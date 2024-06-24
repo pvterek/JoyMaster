@@ -7,22 +7,28 @@ namespace Server.Services;
 
 internal class HandlerService(
     ILogger<HandlerService> logger,
+    IConnectionService connectionService,
     LoggerService loggerService,
-    IClientService clientService
+    ClientService clientService
     ) : Handler.HandlerBase
 {
     private readonly ILogger<HandlerService> _logger = logger;
-    private readonly IClientService _clientService = clientService;
+    private readonly IConnectionService _connectionService = connectionService;
     private readonly LoggerService _loggerService = loggerService;
+    private readonly ClientService _clientService = clientService;
     private string _clientAddress = null!;
+    private string _connectionGuid = null!;
 
-    public override async Task CommandStream(IAsyncStreamReader<InitRequest> requestStream, IServerStreamWriter<CommandReply> responseStream, ServerCallContext context)
+    public override async Task CommandStream(
+        IAsyncStreamReader<Request> requestStream,
+        IServerStreamWriter<Response> responseStream,
+        ServerCallContext context)
     {
         _clientAddress = context.Host;
 
         try
         {
-            await HandleClientAsync(requestStream, responseStream);
+            await HandleConnectionAsync(requestStream, responseStream);
         }
         catch (Exception ex)
         {
@@ -30,42 +36,49 @@ internal class HandlerService(
         }
     }
 
-    private async Task HandleClientAsync(IAsyncStreamReader<InitRequest> requestStream, IServerStreamWriter<CommandReply> responseStream)
+    private async Task HandleConnectionAsync(
+        IAsyncStreamReader<Request> requestStream,
+        IServerStreamWriter<Response> responseStream)
     {
-        bool isFirstRequest = true;
-
         await foreach (var request in requestStream.ReadAllAsync())
         {
-            if (!isFirstRequest)
+            _connectionGuid = request.Id;
+
+            if (!request.IsInitial)
             {
-                await _loggerService.SendMessageWithLogAsync(_logger, request.Id, request.Message, LogLevel.Information);
+                await _loggerService.SendLogAsync(_logger,
+                    request.Id,
+                    request.Message,
+                    LogLevel.Information);
                 continue;
             }
 
-            var existingClient = _clientService.GetClientByIp(_clientAddress);
+            var client = await _clientService.GetClientAsync(request.Name, _clientAddress)
+                ?? await _clientService.RegisterClientAsync(request.Name, _clientAddress);
 
-            if (existingClient != null)
+            if (_connectionService.Get(request.Id) is not null)
             {
-                await _loggerService.SendMessageWithLogAsync(_logger, existingClient.Id, $"Client {existingClient.Name} [{existingClient.AddressIp}] wanted to connect, but it's already on list!", LogLevel.Information);
+                await _loggerService.SendLogAsync(_logger,
+                    request.Id,
+                    $"{client.Name} [{_clientAddress}] wanted to connect, but it's already on list!",
+                    LogLevel.Information);
                 break;
             }
 
-            await _clientService.RegisterClientAsync(responseStream, request.Id, request.Name, _clientAddress);
-            isFirstRequest = false;
+            await _connectionService.RegisterAsync(request.Id, client.Id, responseStream);
         }
 
-        await _clientService.RemoveClientByIpAsync(_clientAddress, "connection finished");
+        await _connectionService.CloseAsync(_connectionGuid);
     }
 
     private async Task HandleExceptionAsync(Exception ex, ServerCallContext context)
     {
-        if (context.CancellationToken.IsCancellationRequested)
+        if (context.CancellationToken.IsCancellationRequested && _connectionGuid is not null)
         {
-            await _clientService.RemoveClientByIpAsync(_clientAddress, "due to cancellation");
+            await _connectionService.CloseAsync(_connectionGuid);
+            return;
         }
-        else
-        {
-            _logger.LogError($"[{_clientAddress}] - {ex.Message}");
-        }
+
+        _logger.LogError($"[{_clientAddress}] - {ex.Message}");
     }
 }
