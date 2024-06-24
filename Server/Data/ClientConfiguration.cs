@@ -23,8 +23,8 @@ public class ClientConfiguration : IEntityTypeConfiguration<Client>
             .HasColumnName(nameof(Client.IpAddress))
             .IsRequired();
 
-        builder.Property(x => x.LastConnectionDate)
-            .HasColumnName(nameof(Client.LastConnectionDate))
+        builder.Property(x => x.CreatedDate)
+            .HasColumnName(nameof(Client.CreatedDate))
             .IsRequired();
     }
 }

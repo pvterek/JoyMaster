@@ -9,11 +9,11 @@ public class LoggerHelper
         return $"[{DateTime.UtcNow:HH:mm:ss}] {message}";
     }
 
-    public Message CreateMessageModel(string clientId, string message)
+    public Message CreateMessageModel(string connectionGuid, string message)
     {
         return new Message
         {
-            ClientId = clientId,
+            ConnectionGuid = connectionGuid,
             MessageContent = message
         };
     }

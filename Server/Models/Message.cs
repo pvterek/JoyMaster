@@ -2,7 +2,7 @@
 
 public class Message
 {
-    public required string ClientId { get; set; }
+    public required string ConnectionGuid { get; set; }
 
     public string? MessageContent { get; set; }
 }

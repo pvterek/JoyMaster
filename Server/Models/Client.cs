@@ -2,13 +2,13 @@
 
 public class Client
 {
-    public required string Id { get; set; }
+    public int Id { get; set; }
 
     public required string Name { get; set; }
 
     public required string IpAddress { get; set; }
 
-    public required DateTime LastConnectionDate { get; set; }
+    public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     public ICollection<Connection> Connection { get; } = [];
 }

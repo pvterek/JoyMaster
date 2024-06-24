@@ -6,12 +6,12 @@ namespace Server.Controllers;
 [Authorize]
 public class ConsoleController : Controller
 {
+    private static readonly string logFileName = $"log{DateTime.Now:yyyyMMdd}.txt";
+    private static readonly string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", logFileName);
+
     public IActionResult Index()
     {
         string logContent = "";
-
-        string logFileName = $"log{DateTime.Now:yyyyMMdd}.txt";
-        string logFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", logFileName);
 
         if (System.IO.File.Exists(logFilePath))
         {

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Server.Data;
+using Server.Repository;
 using Server.Services;
 using Server.Services.Interfaces;
 using Server.Utilities.Exceptions;
@@ -13,13 +14,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>
+builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection")));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationIdentityDbContext>();
+    .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 builder.Services.AddRazorPages();
 
@@ -32,14 +33,17 @@ builder.Services.AddGrpc(options =>
     options.MaxSendMessageSize = 262144;
 });
 
-builder.Services.AddSingleton<IClientDictionary, ClientDictionary>();
+builder.Services.AddSingleton<IActiveConnections, ActiveConnections>();
 
 builder.Services.AddScoped<IMessageSender, MessageSender>();
 builder.Services.AddScoped<LoggerHelper>();
 builder.Services.AddScoped<LoggerService>();
 builder.Services.AddScoped<HandlerService>();
 builder.Services.AddScoped<ManageClientService>();
-builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ClientService>();
 
 builder.Services.AddSignalR();
 

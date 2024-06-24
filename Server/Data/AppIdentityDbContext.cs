@@ -4,6 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Server.Data;
 
-public class ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext> options) : IdentityDbContext<IdentityUser>(options)
+public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options) : IdentityDbContext<IdentityUser>(options)
 {
 }

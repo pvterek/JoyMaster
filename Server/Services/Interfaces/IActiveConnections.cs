@@ -5,7 +5,7 @@ using System.Collections.Concurrent;
 
 namespace Server.Services.Interfaces;
 
-public interface IClientDictionary
+public interface IActiveConnections
 {
-    ConcurrentDictionary<Client, IServerStreamWriter<CommandReply>> Clients { get; }
+    ConcurrentDictionary<Connection, IServerStreamWriter<Response>> Connections { get; }
 }

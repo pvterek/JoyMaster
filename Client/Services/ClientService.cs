@@ -9,18 +9,18 @@ namespace Client.Services;
 internal class ClientService
 {
     private readonly string ClientName = Environment.UserName;
-    private readonly string Id = Guid.NewGuid().ToString();
+    private readonly string ConnectionGuid = Guid.NewGuid().ToString();
 
     public async Task Run()
     {
         var client = ConfigureClient();
         using var call = client.CommandStream();
 
-        var initialRequest = new InitRequest
+        var initialRequest = new Request
         {
-            Id = Id,
+            Id = ConnectionGuid,
             Name = ClientName,
-            Message = $"{ClientName} initial message."
+            IsInitial = true
         };
 
         await call.RequestStream.WriteAsync(initialRequest);
@@ -71,7 +71,7 @@ internal class ClientService
         return new HandlerClient(channel);
     }
 
-    private async Task HandleCommandAsync(string command, IClientStreamWriter<InitRequest> requestStream)
+    private async Task HandleCommandAsync(string command, IClientStreamWriter<Request> requestStream)
     {
         switch (command)
         {
@@ -80,11 +80,12 @@ internal class ClientService
                 break;
             default:
                 var executionResult = await CommandService.ExecuteCommand(command);
-                var request = new InitRequest
+                var request = new Request
                 {
-                    Id = Id,
-                    Name = ClientName,
-                    Message = $"Client {ClientName} responded: {executionResult}"
+                    Id = ConnectionGuid,
+                    //Name = ClientName,
+                    Message = executionResult,
+                    IsInitial = false
                 };
                 await requestStream.WriteAsync(request);
                 break;

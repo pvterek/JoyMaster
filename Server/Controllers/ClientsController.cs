@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
+using Server.Repository;
 using Server.Services;
 using Server.Services.Interfaces;
 using Server.Utilities.Constants;
@@ -10,28 +11,31 @@ namespace Server.Controllers;
 [Authorize]
 public class ClientsController(
     ManageClientService manageClientService,
-    IClientDictionary clientDictionary
+    IActiveConnections activeConnections,
+    IClientRepository clientRepository
     ) : Controller
 {
     private readonly ManageClientService _manageClientService = manageClientService;
-    private readonly IClientDictionary _clientDictionary = clientDictionary;
+    private readonly IActiveConnections _activeConnections = activeConnections;
+    private readonly IClientRepository _clientRepository = clientRepository;
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var clients = _clientDictionary.Clients.Keys.ToList();
+        var connectionIds = _activeConnections.Connections.Keys.Select(c => c.Id).ToList();
+        var clientConnections = await _clientRepository.GetClientConnectionsAsync(connectionIds);
 
-        return View(clients);
+        return View(clientConnections);
     }
 
-    public IActionResult Individual(string id)
+    public IActionResult Individual(string connectionGuid)
     {
-        var client = _clientDictionary.Clients.Keys.FirstOrDefault(c => c.Id == id);
-        if (client == null)
+        var connection = _activeConnections.Connections.Keys.FirstOrDefault(c => c.ConnectionGuid == connectionGuid);
+        if (connection == null)
         {
             return NotFound();
         }
 
-        Message command = new() { ClientId = id };
+        Message command = new() { ConnectionGuid = connectionGuid };
 
         return View(command);
     }
@@ -44,17 +48,17 @@ public class ClientsController(
         return Json(new { success = true });
     }
 
-    public async Task<IActionResult> Disconnect(string id)
+    public async Task<IActionResult> Disconnect(string connectionGuid)
     {
-        var client = _clientDictionary.Clients.Keys.FirstOrDefault(c => c.Id == id);
-        if (client == null)
+        var connection = _activeConnections.Connections.Keys.FirstOrDefault(c => c.ConnectionGuid == connectionGuid);
+        if (connection == null)
         {
             return NotFound();
         }
 
         Message endCommand = new()
         {
-            ClientId = id,
+            ConnectionGuid = connectionGuid,
             MessageContent = AppConstants.EndCommand
         };
         await _manageClientService.ProcessCommand(endCommand);

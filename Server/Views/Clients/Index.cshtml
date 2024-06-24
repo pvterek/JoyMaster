@@ -1,4 +1,4 @@
-﻿@model List<Server.Models.Client>
+﻿@model List<Server.Models.ClientConnectionViewModel>
 
 @{
     ViewData["Title"] = "Clients list";
@@ -7,24 +7,24 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Id</th>
             <th>Name</th>
             <th>Address IP</th>
-            <th>Last Connection Date</th>
+            <th>Connection created date</th>
+            <th>Client created date</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var client in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@client.Id</td>
-                <td>@client.Name</td>
-                <td>@client.IpAddress</td>
-                <td>@client.LastConnectionDate</td>
+                <td>@item.Client.Name</td>
+                <td>@item.Client.IpAddress</td>
+                <td>@item.Connection.ConnectedTime</td>
+                <td>@item.Client.CreatedDate</td>
                 <td>
-                    <a asp-action="Individual" asp-route-id="@client.Id" class="btn btn-primary">Take control</a>
-                    <a asp-action="Disconnect" asp-route-id="@client.Id" class="btn btn-danger">Disconnect</a>
+                    <a asp-action="Individual" asp-route-connectionGuid="@item.Connection.ConnectionGuid" class="btn btn-primary">Take control</a>
+                    <a asp-action="Disconnect" asp-route-connectionGuid="@item.Connection.ConnectionGuid" class="btn btn-danger">Disconnect</a>
                 </td>
             </tr>
         }
