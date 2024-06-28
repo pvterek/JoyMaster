@@ -1,21 +1,23 @@
 ﻿using Grpc.Core;
 using Server.Protos;
+using Server.Services;
 using Server.Services.Interfaces;
 using Server.Utilities.Logs;
 
-namespace Server.Services;
+namespace Server.ConnectionsHandlers;
 
-internal class HandlerService(
-    ILogger<HandlerService> logger,
+internal class CommandStreamHandler(
+    ILogger<CommandStreamHandler> logger,
     IConnectionService connectionService,
     LoggerService loggerService,
     ClientService clientService
-    ) : Handler.HandlerBase
+    ) : CommandStreamer.CommandStreamerBase
 {
-    private readonly ILogger<HandlerService> _logger = logger;
+    private readonly ILogger<CommandStreamHandler> _logger = logger;
     private readonly IConnectionService _connectionService = connectionService;
     private readonly LoggerService _loggerService = loggerService;
     private readonly ClientService _clientService = clientService;
+
     private string _clientAddress = null!;
     private string _connectionGuid = null!;
 

@@ -9,4 +9,11 @@ namespace Server.Services;
 public class ActiveConnections : IActiveConnections
 {
     public ConcurrentDictionary<Connection, IServerStreamWriter<Response>> Connections { get; } = new();
+
+    public KeyValuePair<Connection, IServerStreamWriter<Response>> GetActiveConnection(string connectionGuid)
+    {
+        return Connections.FirstOrDefault(pair => pair.Key.ConnectionGuid == connectionGuid);
+    }
+
+    //add method for remove from list
 }

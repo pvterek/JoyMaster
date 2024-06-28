@@ -1,6 +1,8 @@
 ﻿"use strict";
 
-var connection = new signalR.HubConnectionBuilder().withUrl("/consoleHub").build();
+var connection = new signalR.HubConnectionBuilder()
+    .withUrl("/consoleHub")
+    .build();
 
 connection.on("ReceiveMessage", function (message) {
     var currentConnectionGuid = document.getElementById("connectionGuid").value;
@@ -24,3 +26,12 @@ function sendCommand(connectionGuid) {
         dataType: 'json'
     });
 }
+$(function () {
+    $('#command').on('keydown', function (event) {
+        if (event.key === 'Enter') {
+            sendCommand($('#connectionGuid').val());
+            $('#command').val('');
+            event.preventDefault();
+        }
+    });
+});
