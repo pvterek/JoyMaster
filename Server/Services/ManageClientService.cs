@@ -28,72 +28,74 @@ public class ManageClientService(
             return;
         }
 
-        string command;
-        string parameters = string.Empty;
-        string message = commandModel.MessageContent;
-        int firstSpaceIndex = message.IndexOf(' ');
+        var (command, parameters) = ParseCommand(commandModel.MessageContent);
 
+        var response = CreateResponseEntity(command, parameters);
+
+        await ExecuteCommandAsync(commandModel.ConnectionGuid, response);
+    }
+
+    private (string command, string parameters) ParseCommand(string message)
+    {
+        var firstSpaceIndex = message.IndexOf(' ');
         if (firstSpaceIndex == -1)
-        {
-            command = message;
-        }
-        else
-        {
-            command = message[..firstSpaceIndex];
-            parameters = message[(firstSpaceIndex + 1)..];
-        }
+            return (message, string.Empty);
 
-        switch (command.ToLower())
+        var command = message[..firstSpaceIndex];
+        var parameters = message[(firstSpaceIndex + 1)..];
+        return (command, parameters);
+    }
+
+    private async Task ExecuteCommandAsync(string connectionGuid, Response response)
+    {
+        var command = response.Command;
+
+        switch (command)
         {
             case AppConstants.EndCommand:
-                await SendCommand(commandModel.ConnectionGuid, command);
-                break;
-
-            case AppConstants.SendCommand:
-                await SendCommand(commandModel.ConnectionGuid, parameters);
-                break;
-
-            case AppConstants.StreamCommand:
-                await SendCommand(commandModel.ConnectionGuid, "stream enable");
-                break;
-
             case AppConstants.AlertCommand:
-                await SendCommand(commandModel.ConnectionGuid, command);
+            case AppConstants.SendCommand:
+            case AppConstants.StreamCommand:
+                await SendCommand(connectionGuid, response);
                 break;
 
             default:
                 await _loggerService.SendLogAsync(
                     _logger,
-                    commandModel.ConnectionGuid,
-                    $"Invalid command: {commandModel.MessageContent}",
+                    connectionGuid,
+                    $"Invalid command: {command}",
                     LogLevel.Warning);
                 break;
         }
     }
 
-    private async Task SendCommand(string connectionGuid, string parameters)
+    private async Task SendCommand(string connectionGuid, Response response)
     {
-        var existingConnection = _activeConnections.Connections.FirstOrDefault(pair => pair.Key.ConnectionGuid == connectionGuid);
-        if (existingConnection.Key == null)
+        var existingConnection = _activeConnections.GetActiveConnection(connectionGuid);
+        if (existingConnection.Key is null)
         {
             await _loggerService.SendLogAsync(
                 _logger,
                 connectionGuid,
-                $"No client found for: {connectionGuid}!",
+                $"No active connection found for: {connectionGuid}!",
                 LogLevel.Warning);
         }
-
-        var response = new Response
-        {
-            Message = parameters
-        };
 
         await existingConnection.Value.WriteAsync(response);
 
         await _loggerService.SendLogAsync(
             _logger,
             connectionGuid,
-            $"Command '{parameters}' sent!.",
+            $"Command sent!",
             LogLevel.Information);
+    }
+
+    private Response CreateResponseEntity(string command, string parameters)
+    {
+        return new Response()
+        {
+            Command = command.ToLower(),
+            Parameters = parameters
+        };
     }
 }

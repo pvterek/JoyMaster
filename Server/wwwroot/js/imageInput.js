@@ -15,6 +15,7 @@ connection.on("ReceiveScreenData", (base64Image) => {
         newImageElement.src = 'data:image/png;base64,' + base64Image;
         newImageElement.style.width = "100%";
         newImageElement.style.height = "auto";
+        newImageElement.style.objectFit = "contain";
 
         const clientDesktop = document.getElementById("clientDesktop");
         clientDesktop.appendChild(newImageElement);

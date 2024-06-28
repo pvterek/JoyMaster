@@ -6,11 +6,9 @@ using Server.Utilities.Hubs;
 namespace Server.ConnectionHandlers;
 
 public class ImageStreamHandler(
-    ILogger<ImageStreamHandler> logger,
     IHubContext<ScreenHub> hubContext
     ) : ImageStreamer.ImageStreamerBase
 {
-    private readonly ILogger<ImageStreamHandler> logger = logger;
     private readonly IHubContext<ScreenHub> _hubContext = hubContext;
 
     public override async Task ImageStream(

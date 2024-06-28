@@ -22,7 +22,8 @@ message Request {
 }
 
 message Response {
-  string message = 1;
+  string command = 1;
+  string parameters = 2;
 }
 
 message DesktopFrame {

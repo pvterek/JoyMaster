@@ -1,21 +1,14 @@
 ﻿using Grpc.Core;
-using Grpc.Net.Client;
-using Grpc.Net.Client.Configuration;
 using Server.Protos;
 using System.Windows;
-using static Server.Protos.CommandStreamer;
 
 namespace Client.Services;
 
-internal class ClientService
+internal class ConnectionService
 {
-    private readonly string ClientName = Environment.UserName;
-    public static readonly string ConnectionGuid = Guid.NewGuid().ToString();
-
     private CancellationTokenSource _streamingCts = null!;
     private Task _streamingTask = null!;
-
-    public async Task Run()
+    public async Task HandleConnectionAsync()
     {
         var client = ConfigureClient();
         using var call = client.CommandStream();
@@ -40,38 +33,6 @@ internal class ClientService
         {
             await call.RequestStream.CompleteAsync();
         }
-    }
-
-    private CommandStreamerClient ConfigureClient()
-    {
-        var defaultMethodConfig = new MethodConfig
-        {
-            Names = { MethodName.Default },
-            RetryPolicy = new RetryPolicy
-            {
-                MaxAttempts = 20,
-                InitialBackoff = TimeSpan.FromSeconds(1),
-                MaxBackoff = TimeSpan.FromMinutes(20),
-                BackoffMultiplier = 5,
-                RetryableStatusCodes =
-                {
-                    StatusCode.Unavailable,
-                    //StatusCode.DeadlineExceeded
-                }
-            }
-        };
-
-        var serviceConfig = new ServiceConfig
-        {
-            MethodConfigs = { defaultMethodConfig }
-        };
-
-        var channel = GrpcChannel.ForAddress("https://localhost:7018", new GrpcChannelOptions
-        {
-            ServiceConfig = serviceConfig
-        });
-
-        return new CommandStreamerClient(channel);
     }
 
     private async Task HandleCommandAsync(Response response, IClientStreamWriter<Request> requestStream)
@@ -101,7 +62,7 @@ internal class ClientService
 
             default:
                 //if (_streamingTask != null && !_streamingTask.IsCompleted)
-                var executionResult = await CommandService.ExecuteCommand(parameters);
+                var executionResult = await CommandExecutor.ExecuteCommand(parameters);
                 var request = new Request
                 {
                     Id = ConnectionGuid,
