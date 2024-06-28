@@ -1,6 +1,8 @@
-﻿namespace Client.Services;
+﻿using Client.Services;
 
-public class ImageHandler(
+namespace Client.ConnectionHandlers;
+
+public class ImageStreamHandler(
     ConnectionService clientService,
     ScreenCaptureService screenCaptureService)
 {

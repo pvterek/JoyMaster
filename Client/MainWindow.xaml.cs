@@ -1,18 +1,18 @@
-﻿using Client.Services;
+﻿using Client.ConnectionHandlers;
 using System.Windows;
 
 namespace Client;
 
 public partial class MainWindow : Window
 {
-    private ConnectionHandler _connectionHandler = null!;
+    private CommandStreamHandler _connectionHandler = null!;
 
     public MainWindow()
     {
         InitializeComponent();
     }
 
-    public void Initialize(ConnectionHandler connectionHandler)
+    public void Initialize(CommandStreamHandler connectionHandler)
     {
         _connectionHandler = connectionHandler;
         InitializeAsync();
