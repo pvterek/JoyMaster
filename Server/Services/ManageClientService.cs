@@ -48,9 +48,19 @@ public class ManageClientService(
             case AppConstants.EndCommand:
                 await SendCommand(commandModel.ConnectionGuid, command);
                 break;
+
             case AppConstants.SendCommand:
                 await SendCommand(commandModel.ConnectionGuid, parameters);
                 break;
+
+            case AppConstants.StreamCommand:
+                await SendCommand(commandModel.ConnectionGuid, "stream enable");
+                break;
+
+            case AppConstants.AlertCommand:
+                await SendCommand(commandModel.ConnectionGuid, command);
+                break;
+
             default:
                 await _loggerService.SendLogAsync(
                     _logger,

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Server.ConnectionHandlers;
+using Server.ConnectionsHandlers;
 using Server.Data;
 using Server.Repository;
 using Server.Services;
@@ -29,8 +31,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddGrpc(options =>
 {
     options.Interceptors.Add<ExceptionInterceptor>();
-    options.MaxReceiveMessageSize = 262144;
-    options.MaxSendMessageSize = 262144;
+    //options.MaxReceiveMessageSize = 262144;
+    //options.MaxSendMessageSize = 262144;
 });
 
 builder.Services.AddSingleton<IActiveConnections, ActiveConnections>();
@@ -38,7 +40,8 @@ builder.Services.AddSingleton<IActiveConnections, ActiveConnections>();
 builder.Services.AddScoped<IMessageSender, MessageSender>();
 builder.Services.AddScoped<LoggerHelper>();
 builder.Services.AddScoped<LoggerService>();
-builder.Services.AddScoped<HandlerService>();
+builder.Services.AddScoped<CommandStreamHandler>();
+builder.Services.AddScoped<ImageStreamHandler>();
 builder.Services.AddScoped<ManageClientService>();
 builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
@@ -83,8 +86,10 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
-app.MapGrpcService<HandlerService>();
+app.MapGrpcService<CommandStreamHandler>();
+app.MapGrpcService<ImageStreamHandler>();
 
 app.MapHub<ConsoleHub>("/consoleHub");
+app.MapHub<ScreenHub>("/screenHub");
 
 app.Run();

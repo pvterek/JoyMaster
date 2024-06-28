@@ -6,9 +6,12 @@ package handle;
 
 import "google/protobuf/wrappers.proto";
 
-service Handler {
+service CommandStreamer {
   rpc CommandStream (stream Request) returns (stream Response);
-  rpc StreamDesktop (stream DesktopFrame) returns (stream Empty);
+}
+
+service ImageStreamer {
+	rpc ImageStream (stream DesktopFrame) returns (stream Empty);
 }
 
 message Request {
@@ -23,7 +26,8 @@ message Response {
 }
 
 message DesktopFrame {
-  bytes image = 1;
+  string id = 1;
+  bytes image = 2;
 }
 
 message Empty{
