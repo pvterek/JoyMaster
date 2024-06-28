@@ -4,29 +4,19 @@ using System.Text;
 
 namespace Client.Services;
 
-public class CommandService()
+public class CommandExecutor
 {
-    public static async Task<string> ExecuteCommand(string command)
+    public async Task<string> ExecuteCommand(string command)
     {
         try
         {
             var startInfo = CreateProcessStartInfo(command);
 
-            using var process = new Process { StartInfo = startInfo };
+            using var process = StartProcess(startInfo);
 
-            process.Start();
+            var (StandardOutput, StandardError) = await CaptureProcessOutputAsync(process);
 
-            var outputTask = ReadStreamAsync(process.StandardOutput);
-            var errorTask = ReadStreamAsync(process.StandardError);
-
-            await Task.WhenAll(outputTask, errorTask);
-
-            string output = outputTask.Result;
-            string error = errorTask.Result;
-
-            process.WaitForExit();
-
-            return string.IsNullOrEmpty(output) ? error : output;
+            return string.IsNullOrEmpty(StandardOutput) ? StandardError : StandardOutput;
         }
         catch (Exception ex)
         {
@@ -34,7 +24,7 @@ public class CommandService()
         }
     }
 
-    private static ProcessStartInfo CreateProcessStartInfo(string command)
+    private ProcessStartInfo CreateProcessStartInfo(string command)
     {
         return new ProcessStartInfo
         {
@@ -47,7 +37,26 @@ public class CommandService()
         };
     }
 
-    private static async Task<string> ReadStreamAsync(StreamReader reader)
+    private Process StartProcess(ProcessStartInfo startInfo)
+    {
+        var process = new Process { StartInfo = startInfo };
+        process.Start();
+        return process;
+    }
+
+    private async Task<(string StandardOutput, string StandardError)> CaptureProcessOutputAsync(Process process)
+    {
+        var outputTask = ReadStreamAsync(process.StandardOutput);
+        var errorTask = ReadStreamAsync(process.StandardError);
+
+        await Task.WhenAll(outputTask, errorTask);
+
+        process.WaitForExit();
+
+        return (await outputTask, await errorTask);
+    }
+
+    private async Task<string> ReadStreamAsync(StreamReader reader)
     {
         var output = new StringBuilder();
         while (!reader.EndOfStream)

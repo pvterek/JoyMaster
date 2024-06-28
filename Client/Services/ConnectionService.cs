@@ -1,76 +1,65 @@
 ﻿using Grpc.Core;
-using Server.Protos;
-using System.Windows;
+using Grpc.Net.Client;
+using Grpc.Net.Client.Configuration;
+using static Server.Protos.CommandStreamer;
+using static Server.Protos.ImageStreamer;
 
 namespace Client.Services;
 
-internal class ConnectionService
+public class ConnectionService
 {
-    private CancellationTokenSource _streamingCts = null!;
-    private Task _streamingTask = null!;
-    public async Task HandleConnectionAsync()
+    public readonly string ClientName = Environment.UserName;
+    public readonly string ConnectionGuid;
+
+    public ConnectionService()
     {
-        var client = ConfigureClient();
-        using var call = client.CommandStream();
-
-        var initialRequest = new Request
-        {
-            Id = ConnectionGuid,
-            Name = ClientName,
-            IsInitial = true
-        };
-
-        await call.RequestStream.WriteAsync(initialRequest);
-
-        try
-        {
-            await foreach (var response in call.ResponseStream.ReadAllAsync())
-            {
-                await HandleCommandAsync(response, call.RequestStream);
-            }
-        }
-        finally
-        {
-            await call.RequestStream.CompleteAsync();
-        }
+        ConnectionGuid = Guid.NewGuid().ToString();
     }
 
-    private async Task HandleCommandAsync(Response response, IClientStreamWriter<Request> requestStream)
+    public CommandStreamerClient ConfigureCommandStreamerClient()
     {
-        var command = response.Command;
-        var parameters = response.Parameters;
+        return ConfigureClient<CommandStreamerClient>();
+    }
 
-        switch (command)
+    public ImageStreamerClient ConfigureImageStreamerClient()
+    {
+        return ConfigureClient<ImageStreamerClient>();
+    }
+
+    private T ConfigureClient<T>() where T : class
+    {
+        var defaultMethodConfig = new MethodConfig
         {
-            case AppConstants.EndCommand:
-                _streamingCts?.Cancel();
-                await requestStream.CompleteAsync();
-                break;
-
-            case AppConstants.StreamCommand:
-                if (_streamingTask == null || _streamingTask.IsCompleted)
+            Names = { MethodName.Default },
+            RetryPolicy = new RetryPolicy
+            {
+                MaxAttempts = 20,
+                InitialBackoff = TimeSpan.FromSeconds(1),
+                MaxBackoff = TimeSpan.FromMinutes(20),
+                BackoffMultiplier = 5,
+                RetryableStatusCodes =
                 {
-                    _streamingCts?.Cancel();
-                    _streamingCts = new CancellationTokenSource();
-                    _streamingTask = DesktopStreaming.Run(_streamingCts.Token);
+                    StatusCode.Unavailable,
+                    //StatusCode.DeadlineExceeded
                 }
-                break;
+            }
+        };
 
-            case AppConstants.AlertCommand:
-                MessageBox.Show(parameters, "JoyMaster", MessageBoxButton.OK);
-                break;
+        var serviceConfig = new ServiceConfig
+        {
+            MethodConfigs = { defaultMethodConfig }
+        };
 
-            default:
-                //if (_streamingTask != null && !_streamingTask.IsCompleted)
-                var executionResult = await CommandExecutor.ExecuteCommand(parameters);
-                var request = new Request
-                {
-                    Id = ConnectionGuid,
-                    Message = executionResult,
-                    IsInitial = false
-                };
-                await requestStream.WriteAsync(request);
-                break;
+        var channel = GrpcChannel.ForAddress("https://localhost:7018", new GrpcChannelOptions
+        {
+            ServiceConfig = serviceConfig
+        });
+
+        if (Activator.CreateInstance(typeof(T), channel) is not T client)
+        {
+            throw new InvalidOperationException($"Unable to create an instance of type {typeof(T).FullName}.");
         }
+
+        return client;
     }
 }

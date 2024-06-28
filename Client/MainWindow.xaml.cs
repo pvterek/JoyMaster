@@ -5,9 +5,16 @@ namespace Client;
 
 public partial class MainWindow : Window
 {
+    private ConnectionHandler _connectionHandler = null!;
+
     public MainWindow()
     {
         InitializeComponent();
+    }
+
+    public void Initialize(ConnectionHandler connectionHandler)
+    {
+        _connectionHandler = connectionHandler;
         InitializeAsync();
     }
 
@@ -18,7 +25,6 @@ public partial class MainWindow : Window
 
     public async Task RunServices()
     {
-        var client = new ClientService();
-        await client.Run();
+        await _connectionHandler.HandleConnectionAsync();
     }
 }
