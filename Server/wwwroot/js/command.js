@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/consoleHub")
+    .withUrl("/commandHub")
     .build();
 
 connection.on("ReceiveMessage", function (message) {

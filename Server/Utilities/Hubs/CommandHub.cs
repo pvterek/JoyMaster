@@ -2,6 +2,4 @@
 
 namespace Server.Utilities.Hubs;
 
-public class ConsoleHub() : Hub
-{
-}
+public class CommandHub : Hub { }

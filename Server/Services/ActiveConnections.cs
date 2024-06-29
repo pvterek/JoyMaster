@@ -14,6 +14,4 @@ public class ActiveConnections : IActiveConnections
     {
         return Connections.FirstOrDefault(pair => pair.Key.ConnectionGuid == connectionGuid);
     }
-
-    //add method for remove from list
 }

@@ -9,7 +9,7 @@ public class LoggerHelper
         return $"[{DateTime.UtcNow:HH:mm:ss}] {message}";
     }
 
-    public Message CreateMessageModel(string connectionGuid, string message)
+    public Message CreateMessageEntity(string connectionGuid, string message)
     {
         return new Message
         {

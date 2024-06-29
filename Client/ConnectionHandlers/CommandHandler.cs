@@ -22,7 +22,7 @@ public class CommandHandler(
                 break;
 
             case AppConstants.StreamCommand:
-                _streamingManager.ManageStreamingTask();
+                _streamingManager.CreateStreamingTask();
                 break;
 
             case AppConstants.AlertCommand:

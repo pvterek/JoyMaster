@@ -13,7 +13,7 @@ public class LoggerService(
     public async Task SendLogAsync<T>(ILogger<T> logger, string connectionGuid, string message, LogLevel logLevel)
     {
         var timestampedMessage = _loggerHelper.FormatMessageWithTimestamp(message);
-        var messageModel = _loggerHelper.CreateMessageModel(connectionGuid, timestampedMessage);
+        var messageModel = _loggerHelper.CreateMessageEntity(connectionGuid, timestampedMessage);
 
         await SendMessageAsync(messageModel);
         LogMessage(logger, message, logLevel);
