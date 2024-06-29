@@ -48,7 +48,8 @@ internal class CommandStreamHandler(
 
             if (!request.IsInitial)
             {
-                await _loggerService.SendLogAsync(_logger,
+                await _loggerService.SendLogAsync(
+                    _logger,
                     request.Id,
                     request.Message,
                     LogLevel.Information);
@@ -60,7 +61,8 @@ internal class CommandStreamHandler(
 
             if (_connectionService.Get(request.Id) is not null)
             {
-                await _loggerService.SendLogAsync(_logger,
+                await _loggerService.SendLogAsync(
+                    _logger,
                     request.Id,
                     $"{client.Name} [{_clientAddress}] wanted to connect, but it's already on list!",
                     LogLevel.Information);

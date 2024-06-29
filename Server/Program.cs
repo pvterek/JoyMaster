@@ -37,7 +37,8 @@ builder.Services.AddGrpc(options =>
 
 builder.Services.AddSingleton<IActiveConnections, ActiveConnections>();
 
-builder.Services.AddScoped<IMessageSender, MessageSender>();
+builder.Services.AddScoped<IMessageSender, SenderService>();
+builder.Services.AddScoped<IImageSender, SenderService>();
 builder.Services.AddScoped<LoggerHelper>();
 builder.Services.AddScoped<LoggerService>();
 builder.Services.AddScoped<CommandStreamHandler>();
@@ -47,6 +48,8 @@ builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ClientService>();
+
+builder.Services.AddTransient<ImageDataHelper>();
 
 builder.Services.AddSignalR();
 
@@ -89,7 +92,7 @@ app.MapRazorPages();
 app.MapGrpcService<CommandStreamHandler>();
 app.MapGrpcService<ImageStreamHandler>();
 
-app.MapHub<ConsoleHub>("/consoleHub");
-app.MapHub<ScreenHub>("/screenHub");
+app.MapHub<CommandHub>("/commandHub");
+app.MapHub<ImageHub>("/imageHub");
 
 app.Run();

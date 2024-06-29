@@ -2,19 +2,19 @@
 
 namespace Client.Services;
 
-public class StreamingManager(ImageStreamHandler imageHandler)
+public class StreamingManager(ImageStreamHandler imageStreamHandler)
 {
-    private readonly ImageStreamHandler _imageHandler = imageHandler;
+    private readonly ImageStreamHandler _imageStreamHandler = imageStreamHandler;
     private CancellationTokenSource _streamingCts = null!;
     private Task _streamingTask = null!;
 
-    public void ManageStreamingTask()
+    public void CreateStreamingTask()
     {
         if (_streamingTask == null || _streamingTask.IsCompleted)
         {
             _streamingCts?.Cancel();
             _streamingCts = new CancellationTokenSource();
-            _streamingTask = _imageHandler.StreamImagesAsync(_streamingCts.Token);
+            _streamingTask = _imageStreamHandler.StreamImagesAsync(_streamingCts.Token);
         }
     }
 

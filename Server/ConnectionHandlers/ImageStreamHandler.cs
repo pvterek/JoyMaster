@@ -1,26 +1,51 @@
 ﻿using Grpc.Core;
-using Microsoft.AspNetCore.SignalR;
 using Server.Protos;
-using Server.Utilities.Hubs;
+using Server.Services;
+using Server.Utilities.Logs;
 
 namespace Server.ConnectionHandlers;
 
 public class ImageStreamHandler(
-    IHubContext<ScreenHub> hubContext
+    ILogger<ImageStreamHandler> logger,
+    LoggerService loggerService,
+    IImageSender imageSender,
+    ImageDataHelper imageDataHelper
     ) : ImageStreamer.ImageStreamerBase
 {
-    private readonly IHubContext<ScreenHub> _hubContext = hubContext;
+    private readonly ILogger<ImageStreamHandler> _logger = logger;
+    private readonly LoggerService _loggerService = loggerService;
+    private readonly IImageSender _imageSender = imageSender;
+    private readonly ImageDataHelper _imageDataHelper = imageDataHelper;
+
+    private string _connectionGuid = null!;
 
     public override async Task ImageStream(
         IAsyncStreamReader<DesktopFrame> requestStream,
         IServerStreamWriter<Empty> responseStream,
         ServerCallContext context)
     {
-        await foreach (var frame in requestStream.ReadAllAsync())
+        try
         {
-            var base64Image = Convert.ToBase64String(frame.Image.ToByteArray());
-            await _hubContext.Clients.All.SendAsync("ReceiveScreenData", base64Image);
+            await HandleConnectionAsync(requestStream);
+        }
+        catch (Exception ex)
+        {
+            await _loggerService.SendLogAsync(
+            _logger,
+            _connectionGuid,
+            ex.ToString(),
+            LogLevel.Error);
         }
     }
 
+    private async Task HandleConnectionAsync(IAsyncStreamReader<DesktopFrame> requestStream)
+    {
+        await foreach (var request in requestStream.ReadAllAsync())
+        {
+            _connectionGuid = request.Id;
+
+            var imageData = _imageDataHelper.CreateImageDataEntity(request.Id, request.Image);
+            await _imageSender.SendImageAsync(imageData);
+        }
+    }
 }
