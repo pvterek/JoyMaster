@@ -19,6 +19,7 @@ public class CommandHandler(
             case AppConstants.EndCommand:
                 _streamingManager.CancelStreaming();
                 await requestStream.CompleteAsync();
+                Application.Current.Shutdown();
                 break;
 
             case AppConstants.StreamCommand:

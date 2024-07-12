@@ -4,10 +4,11 @@ using Server.Protos;
 
 namespace Server.Services.Interfaces;
 
-internal interface IConnectionService
+public interface IConnectionService
 {
     Task RegisterAsync(string connectionGuid, int clientId, IServerStreamWriter<Response> responseStream);
     Task CloseAsync(string connectionGuid);
-
-    Connection? Get(string connectionGuid);
+    KeyValuePair<Connection, IServerStreamWriter<Response>> GetActive(string connectionGuid);
+    List<int> GetIdsList();
+    bool ConnectionExists(string connectionGuid);
 }

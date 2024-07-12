@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Server.CommandHandlers;
 using Server.ConnectionHandlers;
 using Server.ConnectionsHandlers;
 using Server.Data;
+using Server.Entities;
 using Server.Repository;
 using Server.Services;
 using Server.Services.Interfaces;
@@ -37,19 +39,25 @@ builder.Services.AddGrpc(options =>
 
 builder.Services.AddSingleton<IActiveConnections, ActiveConnections>();
 
+builder.Services.AddCommandHandlers();
+
+builder.Services.AddScoped<EntitiesCreator>();
+builder.Services.AddScoped<CommandSender>();
+builder.Services.AddScoped<IConnectionService, ConnectionService>();
 builder.Services.AddScoped<IMessageSender, SenderService>();
 builder.Services.AddScoped<IImageSender, SenderService>();
-builder.Services.AddScoped<LoggerHelper>();
 builder.Services.AddScoped<LoggerService>();
 builder.Services.AddScoped<CommandStreamHandler>();
 builder.Services.AddScoped<ImageStreamHandler>();
-builder.Services.AddScoped<ManageClientService>();
-builder.Services.AddScoped<IConnectionService, ConnectionService>();
+builder.Services.AddScoped<ICommandExecutor, CommandExecutor>();
 builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<ClientService>();
+builder.Services.AddScoped<CommandSender>();
 
 builder.Services.AddTransient<ImageDataHelper>();
+builder.Services.AddTransient<EntitiesCreator>();
+builder.Services.AddTransient<LoggerHelper>();
 
 builder.Services.AddSignalR();
 

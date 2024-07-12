@@ -7,7 +7,7 @@ using Server.Utilities.Logs;
 
 namespace Server.ConnectionsHandlers;
 
-internal class CommandStreamHandler(
+public class CommandStreamHandler(
     ILogger<CommandStreamHandler> logger,
     IConnectionService connectionService,
     LoggerService loggerService,
@@ -69,7 +69,7 @@ internal class CommandStreamHandler(
     {
         var client = await GetOrRegisterClientAsync(request.Name, _clientAddress);
 
-        if (_connectionService.Get(request.Id) is not null)
+        if (_connectionService.GetActive(request.Id).Key is not null)
         {
             await _loggerService.SendLogAsync(
                 _logger,
