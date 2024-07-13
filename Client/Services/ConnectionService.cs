@@ -1,8 +1,8 @@
 ﻿using Grpc.Core;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Configuration;
-using static Server.Protos.CommandStreamer;
-using static Server.Protos.ImageStreamer;
+using static Client.Protos.CommandStreamer;
+using static Client.Protos.ImageStreamer;
 
 namespace Client.Services;
 

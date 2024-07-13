@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option csharp_namespace = "Client.Protos";
+
+package handle;
+
+import "google/protobuf/wrappers.proto";
+
+service CommandStreamer {
+  rpc CommandStream (stream Request) returns (stream Response);
+}
+
+service ImageStreamer {
+	rpc ImageStream (stream DesktopFrame) returns (stream Empty);
+}
+
+message Request {
+  string id = 1;
+  google.protobuf.StringValue name = 2;
+  google.protobuf.StringValue message = 3;
+  bool isInitial = 4;
+}
+
+message Response {
+  string command = 1;
+  string parameters = 2;
+}
+
+message DesktopFrame {
+  string id = 1;
+  bytes image = 2;
+}
+
+message Empty{
+}

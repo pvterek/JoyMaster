@@ -1,5 +1,5 @@
-﻿using Grpc.Core;
-using Server.Protos;
+﻿using Client.Protos;
+using Grpc.Core;
 
 namespace Client.CommandHandlers.Interfaces;
 

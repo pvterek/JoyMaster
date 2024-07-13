@@ -1,7 +1,7 @@
 ﻿using Client.CommandHandlers.Interfaces;
+using Client.Protos;
 using Client.Services;
 using Grpc.Core;
-using Server.Protos;
 using System.Windows;
 
 namespace Client.CommandHandlers.Commands;

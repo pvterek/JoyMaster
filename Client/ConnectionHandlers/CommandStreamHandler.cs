@@ -1,6 +1,6 @@
-﻿using Client.Services;
+﻿using Client.Protos;
+using Client.Services;
 using Grpc.Core;
-using Server.Protos;
 
 namespace Client.ConnectionHandlers;
 
