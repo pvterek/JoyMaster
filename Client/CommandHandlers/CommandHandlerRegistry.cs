@@ -1,4 +1,6 @@
-﻿namespace Client.CommandHandlers;
+﻿using Client.CommandHandlers.Interfaces;
+
+namespace Client.CommandHandlers;
 
 public class CommandHandlerRegistry()
 {

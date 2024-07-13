@@ -1,10 +1,10 @@
-﻿using Server.Interfaces;
+﻿using Server.CommandHandlers.Interfaces;
 using Server.Protos;
 using Server.Services;
 
-namespace Server.CommandHandlers;
+namespace Server.CommandHandlers.Commands;
 
-public class SendCommandHandler(CommandSender commandSender) : ICommandHandler
+internal class StreamCommandHandler(CommandSender commandSender) : ICommandHandler
 {
     private readonly CommandSender _commandSender = commandSender;
 

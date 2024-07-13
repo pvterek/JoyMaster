@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
-using Server.Repository;
+using Server.Repository.Interfaces;
 using Server.Services.Interfaces;
 
 namespace Server.Controllers;

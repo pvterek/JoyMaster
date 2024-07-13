@@ -1,9 +1,10 @@
-﻿using Client.Services;
+﻿using Client.CommandHandlers.Interfaces;
+using Client.Services;
 using Grpc.Core;
 using Server.Protos;
 using System.Windows;
 
-namespace Client.CommandHandlers;
+namespace Client.CommandHandlers.Commands;
 
 internal class EndCommandHandler(
     StreamingManager streamingManager

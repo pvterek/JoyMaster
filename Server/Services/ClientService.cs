@@ -1,6 +1,6 @@
 ﻿using Server.Entities;
 using Server.Models;
-using Server.Repository;
+using Server.Repository.Interfaces;
 
 namespace Server.Services;
 

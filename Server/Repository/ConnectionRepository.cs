@@ -1,5 +1,6 @@
 ﻿using Server.Data;
 using Server.Models;
+using Server.Repository.Interfaces;
 
 namespace Server.Repository;
 

@@ -1,4 +1,5 @@
-﻿using Client.Services;
+﻿using Client.CommandHandlers.Commands;
+using Client.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Client.CommandHandlers;

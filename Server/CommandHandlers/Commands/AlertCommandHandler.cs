@@ -1,8 +1,8 @@
-﻿using Server.Interfaces;
+﻿using Server.CommandHandlers.Interfaces;
 using Server.Protos;
 using Server.Services;
 
-namespace Server.CommandHandlers;
+namespace Server.CommandHandlers.Commands;
 
 public class AlertCommandHandler(CommandSender commandSender) : ICommandHandler
 {

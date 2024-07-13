@@ -1,7 +1,7 @@
 ﻿using Grpc.Core;
 using Server.Protos;
 
-namespace Client.CommandHandlers;
+namespace Client.CommandHandlers.Interfaces;
 
 public interface ICommandHandler
 {

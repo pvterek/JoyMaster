@@ -1,7 +1,7 @@
-﻿using Server.Interfaces;
+﻿using Server.CommandHandlers.Interfaces;
 using Server.Protos;
 
-namespace Server.CommandHandlers;
+namespace Server.CommandHandlers.Commands;
 
 public class DefaultCommandHandler : ICommandHandler
 {

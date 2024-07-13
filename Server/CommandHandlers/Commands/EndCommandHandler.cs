@@ -1,10 +1,10 @@
-﻿using Server.Entities;
-using Server.Interfaces;
+﻿using Server.CommandHandlers.Interfaces;
+using Server.Entities;
 using Server.Protos;
 using Server.Services;
-using Server.Utilities.Constants;
+using Server.Utilities;
 
-namespace Server.CommandHandlers;
+namespace Server.CommandHandlers.Commands;
 
 public class EndCommandHandler(
     EntitiesCreator entitiesCreator,
