@@ -58,26 +58,18 @@ public class ConnectionService(
             return;
         }
 
-        if (_activeConnections.Connections.TryRemove(connection))
-        {
-            await SetDisconnectedTime(connection.Key);
+        await SetDisconnectedTime(connection.Key);
 
-            var handler = _commandHandlerRegistry.Resolve(AppConstants.EndCommand);
-            await handler.ExecuteAsync(connectionGuid);
+        var handler = _commandHandlerRegistry.Resolve(AppConstants.EndCommand);
+        await handler.ExecuteAsync(connectionGuid);
 
-            await _loggerService.SendLogAsync(
-                _logger,
-                connectionGuid,
-                "Connection closed successfully!",
-                LogLevel.Information);
-            return;
-        }
+        _activeConnections.Connections.TryRemove(connection);
 
         await _loggerService.SendLogAsync(
                 _logger,
                 connectionGuid,
-                "Closing connection failed!",
-                LogLevel.Error);
+                "Connection closed successfully!",
+                LogLevel.Information);
     }
 
     public KeyValuePair<Connection, IServerStreamWriter<Response>> GetActive(string connectionGuid)

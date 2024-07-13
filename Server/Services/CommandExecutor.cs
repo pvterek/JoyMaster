@@ -28,6 +28,7 @@ public class CommandExecutor(
                 commandModel.ConnectionGuid,
                 "Provided empty command!",
                 LogLevel.Warning);
+
             return;
         }
 
@@ -51,7 +52,7 @@ public class CommandExecutor(
 
     private async Task ExecuteCommandAsync(string connectionGuid, Response response)
     {
-        var command = response.Command;
+        var command = response.Command.ToLower();
         var handler = _commandHandlerRegistry.Resolve(command);
 
         if (handler == null)
