@@ -1,6 +1,6 @@
 ﻿using Server.Entities;
 using Server.Models;
-using Server.Repository;
+using Server.Repository.Interfaces;
 
 namespace Server.Services;
 
@@ -19,9 +19,7 @@ public class ClientService(
     public async Task<Client> RegisterClientAsync(string clientName, string clientIpAddress)
     {
         var client = _entitiesCreator.CreateClient(clientName, clientIpAddress);
-
         await _clientRepository.AddAsync(client);
-
         return client;
     }
 }

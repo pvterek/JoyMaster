@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 using Server.Protos;
-using Server.Services;
+using Server.Utilities;
 using Server.Utilities.Logs;
 
 namespace Server.ConnectionHandlers;

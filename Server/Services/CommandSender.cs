@@ -23,7 +23,6 @@ public class CommandSender(
                 connectionGuid,
                 $"No active connection found for: {connectionGuid}!",
                 LogLevel.Warning);
-
             return;
         }
 

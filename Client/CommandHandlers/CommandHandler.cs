@@ -1,8 +1,7 @@
-﻿using Client.CommandHandlers;
+﻿using Client.Protos;
 using Grpc.Core;
-using Server.Protos;
 
-namespace Client.ConnectionHandlers;
+namespace Client.CommandHandlers;
 
 public class CommandHandler(CommandHandlerRegistry commandHandlerRegistry)
 {

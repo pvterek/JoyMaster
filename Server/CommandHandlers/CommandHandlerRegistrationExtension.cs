@@ -1,4 +1,5 @@
-﻿using Server.Utilities.Constants;
+﻿using Server.CommandHandlers.Commands;
+using Server.Utilities;
 
 namespace Server.CommandHandlers;
 
@@ -10,7 +11,6 @@ public static class CommandHandlerRegistrationExtension
         services.AddScoped<AlertCommandHandler>();
         services.AddScoped<SendCommandHandler>();
         services.AddScoped<StreamCommandHandler>();
-        //services.AddScoped<DefaultCommandHandler>();
 
         services.AddScoped(sp =>
         {

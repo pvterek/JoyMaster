@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Server.Data;
+using Server.Entities.ViewModels;
 using Server.Models;
+using Server.Repository.Interfaces;
 
 namespace Server.Repository;
 

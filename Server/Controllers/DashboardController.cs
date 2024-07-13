@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models;
+using Server.Entities.ViewModels;
 using System.Diagnostics;
 
 namespace Server.Controllers;

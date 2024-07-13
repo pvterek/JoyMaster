@@ -1,8 +1,9 @@
-﻿using Grpc.Core;
-using Server.Protos;
+﻿using Client.CommandHandlers.Interfaces;
+using Client.Protos;
+using Grpc.Core;
 using System.Windows;
 
-namespace Client.CommandHandlers;
+namespace Client.CommandHandlers.Commands;
 
 internal class AlertCommandHandler : ICommandHandler
 {

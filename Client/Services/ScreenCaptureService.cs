@@ -1,5 +1,5 @@
-﻿using Google.Protobuf;
-using Server.Protos;
+﻿using Client.Protos;
+using Google.Protobuf;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;

@@ -1,8 +1,9 @@
-﻿using Client.ConnectionHandlers;
+﻿using Client.CommandHandlers.Interfaces;
+using Client.ConnectionHandlers;
+using Client.Protos;
 using Grpc.Core;
-using Server.Protos;
 
-namespace Client.CommandHandlers;
+namespace Client.CommandHandlers.Commands;
 
 internal class SendCommandHandler(
     RequestHandler requestHandler
