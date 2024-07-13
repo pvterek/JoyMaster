@@ -1,8 +1,9 @@
-﻿using Server.Utilities.Constants;
+﻿using Client.Services;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Server.CommandHandlers;
+namespace Client.CommandHandlers;
 
-public static class CommandHandlerRegistrationExtension
+internal static class CommandHandlerRegistrationExtension
 {
     public static IServiceCollection AddCommandHandlers(this IServiceCollection services)
     {
@@ -10,7 +11,6 @@ public static class CommandHandlerRegistrationExtension
         services.AddScoped<AlertCommandHandler>();
         services.AddScoped<SendCommandHandler>();
         services.AddScoped<StreamCommandHandler>();
-        //services.AddScoped<DefaultCommandHandler>();
 
         services.AddScoped(sp =>
         {

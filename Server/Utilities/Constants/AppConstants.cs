@@ -7,8 +7,5 @@ internal static class AppConstants
     internal const string StreamCommand = "stream";
     internal const string AlertCommand = "alert";
 
-    internal const string EnableStreamCommand = "stream enable";
-    internal const string DisableStreamCommand = "stream disable";
-
-    internal const string EndCommand = "END"; //disabled for CLI usage
+    internal const string EndCommand = "END"; //disabled from CLI usage
 }

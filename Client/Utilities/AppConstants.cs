@@ -6,7 +6,9 @@ internal static class AppConstants
     internal const string EndCommand = "end";
     internal const string StreamCommand = "stream";
     internal const string AlertCommand = "alert";
+    internal const string SendCommand = "send";
 
-    internal const string EnableStreamCommand = "stream enable";
-    internal const string DisableStreamCommand = "stream disable";
+    //Params prompts
+    internal const string EnableParam = "enable";
+    internal const string DisableParam = "disable";
 }

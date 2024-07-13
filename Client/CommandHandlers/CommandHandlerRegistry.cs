@@ -1,6 +1,4 @@
-﻿using Server.Interfaces;
-
-namespace Server.CommandHandlers;
+﻿namespace Client.CommandHandlers;
 
 public class CommandHandlerRegistry()
 {
