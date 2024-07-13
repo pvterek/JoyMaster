@@ -1,37 +1,20 @@
-﻿using Client.Services;
+﻿using Client.CommandHandlers;
 using Grpc.Core;
 using Server.Protos;
-using System.Windows;
 
 namespace Client.ConnectionHandlers;
 
-public class CommandHandler(
-    StreamingManager streamingManager,
-    RequestHandler requestHandler)
+public class CommandHandler(CommandHandlerRegistry commandHandlerRegistry)
 {
-    private readonly StreamingManager _streamingManager = streamingManager;
-    private readonly RequestHandler _requestHandler = requestHandler;
+    private readonly CommandHandlerRegistry _commandHandlerRegistry = commandHandlerRegistry;
 
     public async Task HandleCommandAsync(Response response, IClientStreamWriter<Request> requestStream)
     {
-        switch (response.Command)
-        {
-            case AppConstants.EndCommand:
-                _streamingManager.CancelStreaming();
-                await requestStream.CompleteAsync();
-                break;
+        var command = response.Command.ToLower();
+        var handler = _commandHandlerRegistry.Resolve(command);
 
-            case AppConstants.StreamCommand:
-                _streamingManager.CreateStreamingTask();
-                break;
+        ArgumentNullException.ThrowIfNull(handler);
 
-            case AppConstants.AlertCommand:
-                MessageBox.Show(response.Parameters, "JoyMaster", MessageBoxButton.OK);
-                break;
-
-            default:
-                await _requestHandler.ExecuteCommandAsync(response.Parameters, requestStream);
-                break;
-        }
+        await handler.ExecuteAsync(response, requestStream);
     }
 }

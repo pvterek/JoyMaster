@@ -1,4 +1,5 @@
-﻿using Client.ConnectionHandlers;
+﻿using Client.CommandHandlers;
+using Client.ConnectionHandlers;
 using Client.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -20,6 +21,8 @@ public partial class App : Application
     {
         services.AddSingleton<MainWindow>();
         services.AddSingleton<ConnectionService>();
+
+        services.AddCommandHandlers();
 
         services.AddScoped<CommandStreamHandler>();
         services.AddScoped<CommandExecutor>();

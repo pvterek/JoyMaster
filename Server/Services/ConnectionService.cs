@@ -1,30 +1,37 @@
 ﻿using Grpc.Core;
+using Server.CommandHandlers;
+using Server.Entities;
 using Server.Models;
 using Server.Protos;
 using Server.Repository;
 using Server.Services.Interfaces;
+using Server.Utilities.Constants;
 using Server.Utilities.Logs;
 
 namespace Server.Services;
 
-internal class ConnectionService(
+public class ConnectionService(
     ILogger<ConnectionService> logger,
     LoggerService loggerService,
+    CommandHandlerRegistry commandHandlerRegistry,
     IActiveConnections activeConnections,
-    IConnectionRepository connectionRepository
+    IConnectionRepository connectionRepository,
+    EntitiesCreator entitiesCreator
     ) : IConnectionService
 {
     private readonly ILogger<ConnectionService> _logger = logger;
     private readonly LoggerService _loggerService = loggerService;
+    private readonly CommandHandlerRegistry _commandHandlerRegistry = commandHandlerRegistry;
     private readonly IActiveConnections _activeConnections = activeConnections;
     private readonly IConnectionRepository _connectionRepository = connectionRepository;
+    private readonly EntitiesCreator _entitiesCreator = entitiesCreator;
 
     public async Task RegisterAsync(
         string connectionGuid,
         int clientId,
         IServerStreamWriter<Response> responseStream)
     {
-        var connection = CreateConnectionEntity(connectionGuid, clientId);
+        var connection = _entitiesCreator.CreateConnection(connectionGuid, clientId);
 
         if (_activeConnections.Connections.TryAdd(connection, responseStream))
         {
@@ -32,57 +39,60 @@ internal class ConnectionService(
 
             await _loggerService.SendLogAsync(
                 _logger,
-                connectionGuid,
+                connection.ConnectionGuid,
                 "Successful connection!",
                 LogLevel.Information);
             return;
         }
 
-        _logger.LogError($"Failed registering {connectionGuid} request.");
+        _logger.LogError($"Failed registering {connection.ConnectionGuid} request.");
     }
 
     public async Task CloseAsync(string connectionGuid)
     {
-        var connection = Get(connectionGuid);
+        var connection = GetActive(connectionGuid);
 
-        if (connection is null)
+        if (connection.Key is null)
         {
             _logger.LogError($"Null: {connectionGuid}.");
             return;
         }
 
-        if (_activeConnections.Connections.TryRemove(connection, out _))
-        {
-            await SetDisconnectedTime(connection);
+        await SetDisconnectedTime(connection.Key);
 
-            await _loggerService.SendLogAsync(
-                _logger,
-                connectionGuid,
-                "Connection closed successfully!",
-                LogLevel.Information);
-            return;
-        }
+        var handler = _commandHandlerRegistry.Resolve(AppConstants.EndCommand);
+        await handler.ExecuteAsync(connectionGuid);
+
+        _activeConnections.Connections.TryRemove(connection);
 
         await _loggerService.SendLogAsync(
                 _logger,
                 connectionGuid,
-                "Closing connection failed!",
-                LogLevel.Error);
+                "Connection closed successfully!",
+                LogLevel.Information);
     }
 
-    public Connection? Get(string connectionGuid)
+    public KeyValuePair<Connection, IServerStreamWriter<Response>> GetActive(string connectionGuid)
     {
-        return _activeConnections.Connections.Keys
-            .FirstOrDefault(c => c.ConnectionGuid == connectionGuid);
+        return _activeConnections
+            .Connections
+            .FirstOrDefault(pair => pair.Key.ConnectionGuid == connectionGuid);
     }
 
-    private Connection CreateConnectionEntity(string connectionGuid, int clientId)
+    public List<int> GetIdsList()
     {
-        return new Connection
-        {
-            ConnectionGuid = connectionGuid,
-            ClientId = clientId
-        };
+        return _activeConnections
+            .Connections
+            .Keys
+            .Select(c => c.Id).ToList();
+    }
+
+    public bool ConnectionExists(string connectionGuid)
+    {
+        return _activeConnections
+            .Connections
+            .Keys
+            .Any(c => c.ConnectionGuid == connectionGuid);
     }
 
     private async Task SetDisconnectedTime(Connection connection)

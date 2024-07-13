@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Server.Models;
 using Server.Protos;
 using Server.Services;
 using Server.Services.Interfaces;
@@ -6,7 +7,7 @@ using Server.Utilities.Logs;
 
 namespace Server.ConnectionsHandlers;
 
-internal class CommandStreamHandler(
+public class CommandStreamHandler(
     ILogger<CommandStreamHandler> logger,
     IConnectionService connectionService,
     LoggerService loggerService,
@@ -56,23 +57,42 @@ internal class CommandStreamHandler(
                 continue;
             }
 
-            var client = await _clientService.GetClientAsync(request.Name, _clientAddress)
-                ?? await _clientService.RegisterClientAsync(request.Name, _clientAddress);
-
-            if (_connectionService.Get(request.Id) is not null)
-            {
-                await _loggerService.SendLogAsync(
-                    _logger,
-                    request.Id,
-                    $"{client.Name} [{_clientAddress}] wanted to connect, but it's already on list!",
-                    LogLevel.Information);
-                break;
-            }
-
-            await _connectionService.RegisterAsync(request.Id, client.Id, responseStream);
+            await HandleInitialRequestAsync(request, responseStream);
         }
 
         await _connectionService.CloseAsync(_connectionGuid);
+    }
+
+    private async Task HandleInitialRequestAsync(
+        Request request,
+        IServerStreamWriter<Response> responseStream)
+    {
+        var client = await GetOrRegisterClientAsync(request.Name, _clientAddress);
+
+        if (_connectionService.GetActive(request.Id).Key is not null)
+        {
+            await _loggerService.SendLogAsync(
+                _logger,
+                request.Id,
+                $"{client.Name} [{_clientAddress}] wanted to connect, but it's already on the list!",
+                LogLevel.Information);
+            return;
+        }
+
+        await _connectionService.RegisterAsync(request.Id, client.Id, responseStream);
+    }
+
+    private async Task<Client> GetOrRegisterClientAsync(string clientName, string clientAddress)
+    {
+        var existingClient = await _clientService.GetClientAsync(clientName, clientAddress);
+        if (existingClient != null)
+        {
+            return existingClient;
+        }
+        else
+        {
+            return await _clientService.RegisterClientAsync(clientName, clientAddress);
+        }
     }
 
     private async Task HandleExceptionAsync(Exception ex, ServerCallContext context)
