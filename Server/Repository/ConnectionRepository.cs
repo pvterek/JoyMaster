@@ -4,13 +4,9 @@ using Server.Repository.Interfaces;
 
 namespace Server.Repository;
 
-public class ConnectionRepository(
-    ApplicationDbContext context,
-    ILogger<ConnectionRepository> logger
-    ) : IConnectionRepository
+public class ConnectionRepository(ApplicationDbContext context) : IConnectionRepository
 {
     private readonly ApplicationDbContext _context = context;
-    private readonly ILogger<ConnectionRepository> _logger = logger;
 
     public async Task AddAsync(Connection connection)
     {

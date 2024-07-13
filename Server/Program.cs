@@ -10,6 +10,7 @@ using Server.Repository;
 using Server.Repository.Interfaces;
 using Server.Services;
 using Server.Services.Interfaces;
+using Server.Utilities;
 using Server.Utilities.Exceptions;
 using Server.Utilities.Hubs;
 using Server.Utilities.Logs;

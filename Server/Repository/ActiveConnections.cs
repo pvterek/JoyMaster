@@ -4,7 +4,7 @@ using Server.Protos;
 using Server.Services.Interfaces;
 using System.Collections.Concurrent;
 
-namespace Server.Services;
+namespace Server.Repository;
 
 public class ActiveConnections : IActiveConnections
 {

@@ -1,7 +1,7 @@
 ﻿using Google.Protobuf;
 using Server.Entities;
 
-namespace Server.Services;
+namespace Server.Utilities;
 
 public class ImageDataHelper
 {

@@ -1,4 +1,6 @@
-﻿namespace Server.Models;
+﻿using Server.Models;
+
+namespace Server.Entities.ViewModels;
 
 public class ClientConnectionViewModel
 {

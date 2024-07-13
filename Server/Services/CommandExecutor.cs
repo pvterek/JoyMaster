@@ -28,7 +28,6 @@ public class CommandExecutor(
                 commandModel.ConnectionGuid,
                 "Provided empty command!",
                 LogLevel.Warning);
-
             return;
         }
 
@@ -62,7 +61,6 @@ public class CommandExecutor(
                 connectionGuid,
                 $"Invalid command: {command}",
                 LogLevel.Warning);
-
             return;
         }
 

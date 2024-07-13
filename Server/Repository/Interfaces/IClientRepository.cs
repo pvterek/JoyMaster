@@ -1,4 +1,5 @@
-﻿using Server.Models;
+﻿using Server.Entities.ViewModels;
+using Server.Models;
 
 namespace Server.Repository.Interfaces;
 

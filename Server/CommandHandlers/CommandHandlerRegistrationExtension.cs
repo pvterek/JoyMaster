@@ -11,7 +11,6 @@ public static class CommandHandlerRegistrationExtension
         services.AddScoped<AlertCommandHandler>();
         services.AddScoped<SendCommandHandler>();
         services.AddScoped<StreamCommandHandler>();
-        //services.AddScoped<DefaultCommandHandler>();
 
         services.AddScoped(sp =>
         {

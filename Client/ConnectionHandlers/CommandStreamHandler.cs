@@ -1,4 +1,5 @@
-﻿using Client.Protos;
+﻿using Client.CommandHandlers;
+using Client.Protos;
 using Client.Services;
 using Grpc.Core;
 
